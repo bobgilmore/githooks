@@ -91,6 +91,7 @@ end
 
 name_only = `git diff --cached --name-only`
 
+# Ensure that production.rb is changed when assets are added
 if PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS
   name_only_added = `git diff --cached --name-only --diff-filter=A`
   has_production = name_only.include?('production.rb')
@@ -103,6 +104,7 @@ if PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS
   end
 end
 
+# Prevent changes to .ruby-version (and .rbenv-version)
 if PREVENT_RUBY_VERSION_CHANGES
   name_only.split(/\n/).each do |fil|
     base = File.basename(fil)
@@ -113,6 +115,7 @@ if PREVENT_RUBY_VERSION_CHANGES
   end
 end
 
+# Finally, report errors
 if error_found
   puts "To commit anyway, use --no-verify"
   exit 1
