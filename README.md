@@ -14,6 +14,7 @@ pre-commit
 3. Syntax-check all .rb files
 4. Prevents accidental changes to .ruby-version (and .rbenv-version)
 5. Ensures that changes to assets are accompanied by a change to production.rb (required in my main work environment).
+6. Check for probable private key commits.
 
 Bypassing the Checks
 --------------------
