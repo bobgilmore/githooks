@@ -1,0 +1,104 @@
+#!/usr/bin/env ruby
+
+# Git pre-commit hook that catches errors that I commonly make.
+#
+# To intentionally ignore the hook (i.e., when adding an alert call), commit
+# from the command line with "--no-verify"
+#
+# Loosely based on Henrik Nyh's <http://henrik.nyh.se> work (2011-10-08) 
+# under the MIT License.
+#
+# Bob Gilmore (dev@bobgilmore.name)
+
+############# CONFIGURATION
+
+# The two sections of regular expressions below ("forbidden" and "warning") 
+# will trigger a commit failure, *if* they are found on an added or edited line.
+
+# "Forbidden" regular expressions
+FORBIDDEN = [
+  /BOBG/,     # My TextExpander macros for embedding debug code always include this abbreviation of my name for easy scanning.  Replace with yours.
+  />>>>>>/,   # Git conflict markers
+  /<<<<<</,
+  /======/,
+  /console\.debug/,  # JavaScript debug code that would break IE.
+  /console\.log/
+]
+
+# Things that I probably don't want to commit.  
+# Will force a rejection, but will "label" them in the error message 
+# as "merely" warnings.
+WARNING = [
+  /alert/,          # I *almost* never want to check in a call to commit.  
+  /logger\.debug/,  # Similarly, I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
+  /\.flatten/       # Hash.flatten does not exist in Ruby 1.8.7, where I sometimes (ugh) still work.
+]
+
+# For particular projects
+# Check to make sure that you change production.rb if you add JavaScript or CSS
+PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS = true
+
+############# END OF CONFIGURATION
+
+
+# Check for "forbidden" and "warning" strings
+
+# Loop over ALL errors and warnings and return ALL problems.
+# I want to report on *all* problems found, so that anyone calling 
+# --no-verify has been informed of all problems first. 
+error_found = false
+
+full_diff = `git diff --cached --`
+
+full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
+  added = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
+  # Scan for "forbidden" calls
+  FORBIDDEN.each do |re| 
+    if added.match(re)
+      puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}}
+      error_found = true
+    end
+  end
+  # Scan for "suspect" calls
+  WARNING.each do |re| 
+    if added.match(re)
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}}
+      error_found = true
+    end
+  end
+end
+
+# Syntax check .rb files.
+toplevel = `git rev-parse --show-toplevel`
+name_only = `git diff --cached --name-only`
+name_only.split(/\n/).each do |fil|
+  if File.extname(fil) == '.rb'
+    fullfile = File.join(toplevel.strip, fil)
+    if File.exist?(fullfile)
+      output = `ruby -c #{fullfile}`
+      status = $?.success?
+      unless status
+        puts %{Error: git pre-commit hook found a syntax error in #{file}}
+        error_found = true
+      end
+    end
+  end
+end
+
+if PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS
+  name_only_added = `git diff --cached --name-only --diff-filter=A`
+  name_only       = `git diff --cached --name-only`
+  has_production = name_only.include?('production.rb')
+  name_only_added.split(/\n/).each do |fil|
+    ext = File.extname(fil)
+    if (ext == '.css' || ext == '.scss' || ext == '.js' || ext == '.coffee' || ext == '.less') && !has_production
+      puts %{Error: git pre-commit hook found attempt to add #{fil} without editing production.rb}
+      error_found = true
+    end
+  end
+end
+
+if error_found
+  puts "To commit anyway, use --no-verify"
+  exit 1
+end
