@@ -35,8 +35,12 @@ WARNING = [
 ]
 
 # For particular projects
+
 # Check to make sure that you change production.rb if you add JavaScript or CSS
 PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS = true
+
+# Prevent inadvertent .ruby-version and .rbenv-version commits
+PREVENT_RUBY_VERSION_CHANGES = true
 
 ############# END OF CONFIGURATION
 
@@ -85,14 +89,25 @@ name_only.split(/\n/).each do |fil|
   end
 end
 
+name_only = `git diff --cached --name-only`
+
 if PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS
   name_only_added = `git diff --cached --name-only --diff-filter=A`
-  name_only       = `git diff --cached --name-only`
   has_production = name_only.include?('production.rb')
   name_only_added.split(/\n/).each do |fil|
     ext = File.extname(fil)
     if (ext == '.css' || ext == '.scss' || ext == '.js' || ext == '.coffee' || ext == '.less') && !has_production
       puts %{Error: git pre-commit hook found attempt to add #{fil} without editing production.rb}
+      error_found = true
+    end
+  end
+end
+
+if PREVENT_RUBY_VERSION_CHANGES
+  name_only.split(/\n/).each do |fil|
+    base = File.basename(fil)
+    if base == '.ruby-version' || base == '.rbenv-version'
+      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.  This is probably an error.}
       error_found = true
     end
   end
