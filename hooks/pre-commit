@@ -25,6 +25,12 @@ FORBIDDEN = [
   /console\.log/
 ]
 
+# Warning signs that someone is committing a private key
+PRIVATE_KEY = [
+  /PRIVATE KEY/,
+  /ssh-rsa/
+]
+
 # Things that I probably don't want to commit.  
 # Will force a rejection, but will "label" them in the error message 
 # as "merely" warnings.
@@ -60,6 +66,13 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   FORBIDDEN.each do |re| 
     if added.match(re)
       puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}}
+      error_found = true
+    end
+  end
+  # Scan for private key indicators
+  PRIVATE_KEY.each do |re| 
+    if added.match(re)
+      puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}}
       error_found = true
     end
   end
