@@ -16,6 +16,15 @@ pre-commit
 5. Ensures that changes to assets are accompanied by a change to production.rb (required in my main work environment).
 6. Check for probable private key commits.
 
+Installation
+------------
+cd into the top level of a project that you want to check commits for.  Then,
+
+    cd .git
+    git clone git@github.com:bobgilmore/githooks.git
+    rm -rf hooks (assuming you don't have anything interesting in there already)
+    mv githooks hooks
+
 Bypassing the Checks
 --------------------
 Call git commit with the --no-verify flag
