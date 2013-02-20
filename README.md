@@ -22,7 +22,7 @@ cd into the top level of a project that you want to check commits for.  Then,
 
     cd .git
     git clone git@github.com:bobgilmore/githooks.git
-    rm -rf hooks (assuming you don't have anything interesting in there already)
+    rm -rf hooks # assuming there's nothing interesting in there already
     mv githooks hooks
 
 Bypassing the Checks
