@@ -22,7 +22,8 @@ FORBIDDEN = [
   /<<<<<</,
   /======/,
   /console\.debug/,  # JavaScript debug code that would break IE.
-  /console\.log/
+  /console\.log/,
+  /binding\.pry/
 ]
 
 # Warning signs that someone is committing a private key
