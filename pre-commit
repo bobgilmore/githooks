@@ -5,25 +5,26 @@
 # To intentionally ignore the hook (i.e., when adding an alert call), commit
 # from the command line with "--no-verify"
 #
-# Loosely based on Henrik Nyh's <http://henrik.nyh.se> work (2011-10-08) 
+# Loosely based on Henrik Nyh's <http://henrik.nyh.se> work (2011-10-08)
 # under the MIT License.
 #
 # Bob Gilmore (dev@bobgilmore.name)
 
 ############# CONFIGURATION
 
-# The two sections of regular expressions below ("forbidden" and "warning") 
+# The two sections of regular expressions below ("forbidden" and "warning")
 # will trigger a commit failure, *if* they are found on an added or edited line.
 
 # "Forbidden" regular expressions
 FORBIDDEN = [
-  /BOBG/,     # My TextExpander macros for embedding debug code always include this abbreviation of my name for easy scanning.  Replace with yours.
+  /TMP_DEBUG/,     # My TextExpander macros for embedding debug code always include this abbreviation of my name for easy scanning.  Replace with yours.
   />>>>>>/,   # Git conflict markers
   /<<<<<</,
   /======/,
   /console\.debug/,  # JavaScript debug code that would break IE.
   /console\.log/,
-  /binding\.pry/
+  /binding\.pry/,
+  /binding\.remote_pry/
 ]
 
 # Warning signs that someone is committing a private key
@@ -32,11 +33,11 @@ PRIVATE_KEY = [
   /ssh-rsa/
 ]
 
-# Things that I probably don't want to commit.  
-# Will force a rejection, but will "label" them in the error message 
+# Things that I probably don't want to commit.
+# Will force a rejection, but will "label" them in the error message
 # as "merely" warnings.
 WARNING = [
-  /alert/,          # I *almost* never want to check in a call to commit.  
+  /alert/,          # I *almost* never want to check in a call to commit.
   /logger\.debug/  # Similarly, I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
 ]
 
@@ -54,8 +55,8 @@ PREVENT_RUBY_VERSION_CHANGES = true
 # Check for "forbidden" and "warning" strings
 
 # Loop over ALL errors and warnings and return ALL problems.
-# I want to report on *all* problems found, so that anyone calling 
-# --no-verify has been informed of all problems first. 
+# I want to report on *all* problems found, so that anyone calling
+# --no-verify has been informed of all problems first.
 error_found = false
 
 full_diff = `git diff --cached --`
@@ -63,21 +64,21 @@ full_diff = `git diff --cached --`
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   added = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
   # Scan for "forbidden" calls
-  FORBIDDEN.each do |re| 
+  FORBIDDEN.each do |re|
     if added.match(re)
       puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}}
       error_found = true
     end
   end
   # Scan for private key indicators
-  PRIVATE_KEY.each do |re| 
+  PRIVATE_KEY.each do |re|
     if added.match(re)
       puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}}
       error_found = true
     end
   end
   # Scan for "suspect" calls
-  WARNING.each do |re| 
+  WARNING.each do |re|
     if added.match(re)
       puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}}
       error_found = true
