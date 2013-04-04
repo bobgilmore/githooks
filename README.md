@@ -25,5 +25,4 @@ Clone the repository locally, then run the setup script, passing the location of
     
     git clone git@github.com:bobgilmore/githooks.git
     cd (into the newly-created repository directory)
-    chmod 777 ./setup.sh
     ./setup.sh path_to_repo_that_you_want_to_add_hooks_to
