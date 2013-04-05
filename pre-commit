@@ -86,6 +86,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   end
 end
 
+=begin
 # Syntax check .rb files.
 toplevel = `git rev-parse --show-toplevel`
 name_only = `git diff --cached --name-only`
@@ -102,6 +103,7 @@ name_only.split(/\n/).each do |fil|
     end
   end
 end
+=end
 
 name_only = `git diff --cached --name-only`
 
