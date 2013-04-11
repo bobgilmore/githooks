@@ -10,10 +10,12 @@ pre-commit
     2. personalized debugging statements
     3. Debugger calls
 2. Catches other suspicious code, such as calls to alert (very uncommon for me)
-3. ~~Syntax-check all .rb files~~ Temporarily deactivated 
-4. Prevents accidental changes to .ruby-version (and .rbenv-version)
-5. Ensures that changes to assets are accompanied by a change to production.rb (required in my main work environment).
-6. Check for probable private key commits.
+3. ~~Syntax-check all .rb files~~ Temporarily deactivated
+6. Check for probable private key commits. 
+4. *Conditionally* prevents accidental changes to .ruby-version (and .rbenv-version).  Prevents these changes by default. 
+    * Run `git config hooks.allowrubyversionchange true` in a project directory to allow it for that particular project.
+5. *Conditionally* ensures that changes to assets are accompanied by a change to production.rb (required in my main work environment).  Does *not* prevent these changes by default.
+    * Run `git config hooks.newassetsrequireproductionchange true` in a project directory to prevent it for that particular project.
 
 Bypassing the Checks
 --------------------

@@ -17,14 +17,14 @@
 
 # "Forbidden" regular expressions
 FORBIDDEN = [
-  /TMP_DEBUG/,     # My TextExpander macros for embedding debug code always include this abbreviation of my name for easy scanning.  Replace with yours.
-  />>>>>>/,   # Git conflict markers
-  /<<<<<</,
-  /======/,
+  /TMP_DEBUG/, # My TextExpander macros for embedding debug code always include this for easy scanning.
+  />>>>>>/,    # Git conflict markers
+  /<<<<<</,    # ''
+  /======/,    # ''
   /console\.debug/,  # JavaScript debug code that would break IE.
-  /console\.log/,
-  /binding\.pry/,
-  /binding\.remote_pry/
+  /console\.log/,    # ''
+  /binding\.pry/,        # pry debugging code
+  /binding\.remote_pry/  # ''
 ]
 
 # Warning signs that someone is committing a private key
@@ -41,22 +41,21 @@ WARNING = [
   /logger\.debug/  # Similarly, I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
 ]
 
-# For particular projects
+# For particular projects - configurable on a per-project git config basis
 
-# Check to make sure that you change production.rb if you add JavaScript or CSS
-PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS = true
+# Check to ensure that if you add JavaScript or CSS, you change production.rb.  This is required at my current employer.
+NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = ( `git config hooks.newassetsrequireproductionchange`.strip || 'false') == 'true'
 
-# Prevent inadvertent .ruby-version and .rbenv-version commits
-PREVENT_RUBY_VERSION_CHANGES = true
+# Prevent inadvertent .ruby-version and .rbenv-version commits.  I rarely edit these files, so any attempt to commit is probably an accident.
+ALLOW_RUBY_VERSION_CHANGES = ( `git config hooks.allowrubyversionchange`.strip || 'false') == 'true'
 
 ############# END OF CONFIGURATION
-
 
 # Check for "forbidden" and "warning" strings
 
 # Loop over ALL errors and warnings and return ALL problems.
-# I want to report on *all* problems found, so that anyone calling
-# --no-verify has been informed of all problems first.
+# I want to report on *all* problems that exist in the commit before aborting, 
+# so that anyone calling --no-verify has been informed of all problems first.
 error_found = false
 
 full_diff = `git diff --cached --`
@@ -66,21 +65,21 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   # Scan for "forbidden" calls
   FORBIDDEN.each do |re|
     if added.match(re)
-      puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}}
+      puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
     end
   end
   # Scan for private key indicators
   PRIVATE_KEY.each do |re|
     if added.match(re)
-      puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}}
+      puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
     end
   end
   # Scan for "suspect" calls
   WARNING.each do |re|
     if added.match(re)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}}
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
     end
   end
@@ -108,24 +107,24 @@ end
 name_only = `git diff --cached --name-only`
 
 # Ensure that production.rb is changed when assets are added
-if PRODUCTION_RB_CHANGE_REQUIRED_FOR_ASSETS
+if NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE
   name_only_added = `git diff --cached --name-only --diff-filter=A`
   has_production = name_only.include?('production.rb')
   name_only_added.split(/\n/).each do |fil|
     ext = File.extname(fil)
     if (ext == '.css' || ext == '.scss' || ext == '.js' || ext == '.coffee' || ext == '.less') && !has_production
-      puts %{Error: git pre-commit hook found attempt to add #{fil} without editing production.rb}
+      puts %{Error: git pre-commit hook found attempt to add #{fil} without editing production.rb\nThis is probably an error.\nTo allow this for this project, run\ngit config hooks.newassetsrequireproductionchange true\nand try again.\n-------------- }
       error_found = true
     end
   end
 end
 
 # Prevent changes to .ruby-version (and .rbenv-version)
-if PREVENT_RUBY_VERSION_CHANGES
+unless ALLOW_RUBY_VERSION_CHANGES
   name_only.split(/\n/).each do |fil|
     base = File.basename(fil)
     if base == '.ruby-version' || base == '.rbenv-version'
-      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.  This is probably an error.}
+      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.\nThis is probably an error.\nTo allow this for this project, run\ngit config hooks.allowrubyversionchange true\nand try again.\n-------------- }
       error_found = true
     end
   end
