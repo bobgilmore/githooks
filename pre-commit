@@ -24,7 +24,8 @@ FORBIDDEN = [
   /console\.debug/,  # JavaScript debug code that would break IE.
   /console\.log/,    # ''
   /binding\.pry/,        # pry debugging code
-  /binding\.remote_pry/  # ''
+  /binding\.remote_pry/, # ''
+  /debugger/ # JavaScript debugging
 ]
 
 # Warning signs that someone is committing a private key
