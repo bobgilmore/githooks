@@ -14,7 +14,7 @@ pre-commit
 2. Catches other suspicious code, such as the addition of calls to `alert` (very uncommon for me)
 3. ~~Syntax-check all .rb files~~ Temporarily deactivated
 6. Check for probable private key commits. 
-4. *Conditionally* prevents changes to .ruby-version (and .rbenv-version).  In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.  Prevents these changes by default. 
+4. *Conditionally* prevents changes to `.ruby-version` (and `.rbenv-version`).  In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.  Prevents these changes by default. 
     * Run `git config hooks.allowrubyversionchange true` in a project directory to allow it for that particular project.
 5. *Conditionally* ensures that changes to assets are accompanied by a change to production.rb (required in my former employer's main work environment).  Does *not* prevent these changes by default.
     * Run `git config hooks.newassetsrequireproductionchange true` in a project directory to prevent it for that particular project.
