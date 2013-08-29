@@ -25,7 +25,8 @@ FORBIDDEN = [
   /console\.log/,    # ''
   /binding\.pry/,        # pry debugging code
   /binding\.remote_pry/, # ''
-  /debugger/ # JavaScript debugging
+  /save_and_open_page/,  # Launchy debugging code
+  /debugger/             # Ruby debugging code
 ]
 
 # Warning signs that someone is committing a private key
