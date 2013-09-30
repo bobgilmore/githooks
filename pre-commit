@@ -29,6 +29,13 @@ FORBIDDEN = [
   /debugger/             # Ruby debugging code
 ]
 
+USER = ENV["USER"]
+USER_HOME = [
+  Regexp.new("/home/#{USER}"),        # Hard-coded path to user's HOME
+  Regexp.new("/Users/#{USER}"),       # ''
+  Regexp.new("/export/home/#{USER}")  # '' (for a current work config)
+]
+
 # Warning signs that someone is committing a private key
 PRIVATE_KEY = [
   /PRIVATE KEY/,
@@ -68,6 +75,13 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   FORBIDDEN.each do |re|
     if added.match(re)
       puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}\n--------------}
+      error_found = true
+    end
+  end
+  # Scan for probable HARD_CODED references to user's home directory
+  USER_HOME.each do |re|
+    if added.match(re)
+      puts %{Error: git pre-commit hook forbids committing lines that look like a hard-coded home directory: "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
     end
   end
