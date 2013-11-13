@@ -3,8 +3,8 @@
 # Find the location of the script.
 DOTFILE_DIRECTORY=`pwd`
 
-git config --global init.templatedir $DOTFILE_DIRECTORY
-echo "From now on, when creating a repo by running 'git init', the new repo will"
-echo "use $DOTFILE_DIRECTORY as its git hooks directory."
-echo "It is safe to run 'git init' in an existing repo to re-initialize this."
-echo ""
+echo "Creating symbolic links in .git/hooks..."
+rm -rf "$1/.git/hooks"
+ln -is "$DOTFILE_DIRECTORY" "$1/.git/hooks"
+
+echo "...done"

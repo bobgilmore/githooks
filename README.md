@@ -27,10 +27,9 @@ There's no way to turn off individual checks (other than the "conditional" ones 
 
 Installation
 ============
-1. Clone the repository locally.
+Clone the repository locally, then run the setup script, passing the location of the
+repo that you want to add hooks to as an input argument:
+    
     git clone git@github.com:bobgilmore/githooks.git
-2. Run the setup script.  This will configure git to create all *new* git repos with *this* repo for its githooks.
     cd (into the newly-created repository directory)
-    ./setup.sh
-3. If you want to configure any previously existing repos to use these githooks, cd into that repo and run
-    git init
+    ./setup.sh path_to_repo_that_you_want_to_add_hooks_to
