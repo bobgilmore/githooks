@@ -20,13 +20,16 @@ FORBIDDEN = [
   /TMP_DEBUG/, # My TextExpander macros for embedding debug code always include this for easy scanning.
   />>>>>>/,    # Git conflict markers
   /<<<<<</,    # ''
-  /======/,    # ''
   /console\.debug/,  # JavaScript debug code that would break IE.
   /console\.log/,    # ''
   /binding\.pry/,        # pry debugging code
   /binding\.remote_pry/, # ''
   /save_and_open_page/,  # Launchy debugging code
   /debugger/             # Ruby debugging code
+]
+
+FORBIDDEN_EXCEPT_IN_FILES = [
+  [ /====/, ['.md', '.mmd'] ]
 ]
 
 USER = ENV["USER"]
@@ -52,7 +55,7 @@ WARNING = [
 
 # For particular projects - configurable on a per-project git config basis
 
-# Check to ensure that if you add JavaScript or CSS, you change production.rb.  This is required at my current employer.
+# Check to ensure that if you add JavaScript or CSS, you change production.rb.  This is required by one of my employers.
 NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = ( `git config hooks.newassetsrequireproductionchange`.strip || 'false') == 'true'
 
 # Prevent inadvertent .ruby-version and .rbenv-version commits.  I rarely edit these files, so any attempt to commit is probably an accident.
@@ -78,6 +81,17 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
       error_found = true
     end
   end
+
+  FORBIDDEN_EXCEPT_IN_FILES.each do |re_exts|
+    unless re_exts[1].include? File.extname(file)
+      re = re_exts[0]
+      if added.match(re)
+        puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}\n--------------}
+        error_found = true
+      end
+    end
+  end
+
   # Scan for probable HARD_CODED references to user's home directory
   USER_HOME.each do |re|
     if added.match(re)
