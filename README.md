@@ -5,7 +5,7 @@ My personal githooks, which help me avoid silly or obvious mistakes.
 
 I started writing these with Ruby on Rails in mind, so most of the checks are for Ruby, JavaScript, or general git use.  I've sprinkled a few checks here and there for problems in other languages, and I'll add more.
 
-If you know of a common mistake, please create an issue, or better yet, a pull request.  See *[Advice for Editors]*(#advice-for-committers) below.
+If you know of a common mistake, please create an issue, or better yet, a pull request.  See [Advice for Committers](#advice-for-committers) below.
 
 pre-commit
 ----------
