@@ -106,11 +106,14 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
       error_found = true
     end
   end
-  # Scan for "suspect" calls
+  # Scan for "suspect" calls in files that *aren't* in assets/**/vendor
   WARNING.each do |re|
-    if added.match(re)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}\n--------------}
-      error_found = true
+    dir = File.dirname(file)
+    unless /assets\// =~ dir && /\/vendor/ =~ dir
+      if added.match(re)
+        puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}\n--------------}
+        error_found = true
+      end
     end
   end
 end
