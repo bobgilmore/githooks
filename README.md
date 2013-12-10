@@ -3,7 +3,9 @@ githooks
 
 My personal githooks, which help me avoid silly or obvious mistakes.
 
-If you know of a common mistake, please create an issue, or better yet, a pull request. 
+These githooks were written with a Ruby-on-Rails app in mind, so most of the hecks are related common coding issues in Ruby, JavaScript, or general git use.  However, I've sprinkled a few checks here and there for problems in other languages, and I'm happy to consider more.
+
+If you know of a common mistake, please create an issue, or better yet, a pull request.
 
 pre-commit
 ----------
@@ -27,9 +29,29 @@ There's no way to turn off individual checks (other than the "conditional" ones 
 
 Installation
 ============
-Clone the repository locally, then run the setup script, passing the location of the
-repo that you want to add hooks to as an input argument:
+Clone this repository locally, then run its setup script, passing the location of *the repo that you want to add hooks to* as an input argument.
     
     git clone git@github.com:bobgilmore/githooks.git
     cd (into the newly-created repository directory)
     ./setup.sh path_to_repo_that_you_want_to_add_hooks_to
+
+This will create symbolic links in the `.git` directory of the repo that you're adding to, which point to this githooks repo.
+
+Updating the Hooks
+==================
+Since the githook files that we're creating in your individual repos are all symbolic links into *this* repo, updating or changing *this* repo will affect *all repos that you set this up for at once.*
+
+Advice for For Editors
+======================
+
+Only Add Repo-Specific Changes *Conditionally*
+----------------------------------------------
+Since all of your affected repos have symlinks to one shared set of hooks, avoid making project-specific changes to the hook files.  Rather, consider making the behavior change based on an **optional** git configuration variable, and then setting that variable for the projects where it's necessary.
+
+See how I handle `newassetsrequireproductionchange` in the `pre-commit` file for an example of how to do this.
+
+Writing Checks to Run (or Ignore) for Some Extensions or Directories
+-----------------------
+I don't have many examples of checks that should be run (or ignored) based on extension or directory, so that code isn't really designed to scale.
+
+If you want to add more checks like that, talk to me - we should probably make the solutions scalable.
