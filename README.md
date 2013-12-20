@@ -39,7 +39,10 @@ This will create symbolic links in the `.git` directory of the repo that you're 
 
 Updating the Hooks
 ==================
-Since the githook files that you're creating in your individual repos are all symbolic links into *this* repo, updating or changing *this* repo will affect *all repos that you set this up for, all at once.*
+Since the githook files that you'll be creating in your individual repos are all symbolic links into your (probably) one local copy of this repo, updating or changing your local copy of this repo will affect *all repos that you set this up for, all at once.*  Note; this goes both ways:
+
+- If you pull updates from Github to your local copy, all of your repos will instantaneously get the updates.
+- If you edit your local copy to make a change in one of your project, you'll effect *all* of your projects.  Of course, you *could* set up multiple local copies of this repo for different "styles" of project, but read the next section for a better approach.
 
 Advice for Committers
 ======================
