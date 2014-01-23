@@ -3,7 +3,7 @@ githooks
 
 My personal githooks, which help me avoid silly or obvious mistakes.
 
-I started writing these with Ruby on Rails in mind, so most of the checks are for Ruby, JavaScript, or general git use.  I've sprinkled a few checks here and there for problems in other languages, and I'll add more.
+I started writing these at a full-stack Ruby on Rails -based position, so most of the checks are for Ruby, JavaScript, or general git use.  I've sprinkled a few checks here and there for problems in other languages, and I'll add more.
 
 If you know of a common mistake, please create an issue, or better yet, a pull request.  See [Advice for Committers](#advice-for-committers) below.
 
@@ -29,8 +29,9 @@ There's no way to turn off individual checks (other than the "conditional" ones 
 
 Installation
 ============
-Clone this repository locally, then run its setup script, passing the location of *the repo that you want to add hooks to* as an input argument.
+Clone this repository locally into some central location.  Then run its setup script, passing the location of *the repo that you want to add hooks to* as an input argument.
     
+    cd (someplace "central." For me, that's usually ~/code)
     git clone git@github.com:bobgilmore/githooks.git
     cd (into the newly-created repository directory)
     ./setup.sh path_to_repo_that_you_want_to_add_hooks_to
@@ -39,7 +40,7 @@ This will create symbolic links in the `.git` directory of the repo that you're 
 
 Updating the Hooks
 ==================
-Since the githook files that you'll be creating in your individual repos are all symbolic links into your (probably) one local copy of this repo, updating or changing your local copy of this repo will affect *all repos that you set this up for, all at once.*  Note; this goes both ways:
+Since the githook files that you'll be creating in your individual repos are all symbolic links into your (presumably) one local copy of this repo, updating or changing your local copy of this repo will affect *all repos that you set this up for, all at once.*  Note; this goes both ways:
 
 - If you pull updates from Github to your local copy, all of your repos will instantaneously get the updates.
 - If you edit your local copy to make a change in one of your project, you'll effect *all* of your projects.  Of course, you *could* set up multiple local copies of this repo for different "styles" of project, but read the next section for a better approach.
@@ -47,14 +48,14 @@ Since the githook files that you'll be creating in your individual repos are all
 Advice for Committers
 ======================
 
-Only Add Repo-Specific Changes *Conditionally*
-----------------------------------------------
-Since all of your affected repos have symlinks to one shared set of hooks, avoid making project-specific changes to the hook files.  Rather, make the behavior change based on an **optional** git configuration variable, and then set that variable for the projects where it's necessary.
+Add Repo-Specific Changes *Conditionally*
+---------
+Since all of your affected repos have symlinks to one shared set of hooks, don't make project-specific changes to the hook files.  Rather, make the behavior change based on an **optional** git configuration variable, and then set that variable for the projects where it's necessary.
 
 See how I handle `newassetsrequireproductionchange` in the `pre-commit` file for an example of how to do this.
 
 Writing Checks to Run (or Ignore) for Some Extensions or Directories
------------------------
+---------
 I don't have many examples of checks that should be run (or ignored) based on extension or directory, so that code isn't really designed to scale.
 
 If you want to add more checks like that, talk to me - we should probably fix that.
