@@ -56,10 +56,13 @@ WARNING = [
 # For particular projects - configurable on a per-project git config basis
 
 # Check to ensure that if you add JavaScript or CSS, you change production.rb.  This is required by one of my employers.
-NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = ( `git config hooks.newassetsrequireproductionchange`.strip || 'false') == 'true'
+NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDEFINED = `git config hooks.newassetsrequireproductionchange`.strip.empty?
+NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDEFINED || (`git config hooks.newassetsrequireproductionchange`.strip == 'true')
+
 
 # Prevent inadvertent .ruby-version and .rbenv-version commits.  I rarely edit these files, so any attempt to commit is probably an accident.
-ALLOW_RUBY_VERSION_CHANGES = ( `git config hooks.allowrubyversionchange`.strip || 'false') == 'true'
+ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
+ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
 
 ############# END OF CONFIGURATION
 
@@ -146,7 +149,7 @@ if NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE
   name_only_added.split(/\n/).each do |fil|
     ext = File.extname(fil)
     if (ext == '.css' || ext == '.scss' || ext == '.js' || ext == '.coffee' || ext == '.less') && !has_production
-      puts %{Error: git pre-commit hook found attempt to add #{fil} without editing production.rb\nThis is probably an error.\nTo allow this for this project, run\ngit config hooks.newassetsrequireproductionchange true\nand try again.\n-------------- }
+      puts %{Error: git pre-commit hook found attempt to add #{fil} without editing production.rb\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.newassetsrequireproductionchange false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.newassetsrequireproductionchange false\nand try again.\n-------------- }
       error_found = true
     end
   end
@@ -157,7 +160,7 @@ unless ALLOW_RUBY_VERSION_CHANGES
   name_only.split(/\n/).each do |fil|
     base = File.basename(fil)
     if base == '.ruby-version' || base == '.rbenv-version'
-      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.\nThis is probably an error.\nTo allow this for this project, run\ngit config hooks.allowrubyversionchange true\nand try again.\n-------------- }
+      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.allowrubyversionchange true\nand try again.\n\nTo permanently allow it for *all* repos, run\ngit config --global hooks.allowrubyversionchange true\nand try again.\n-------------- }
       error_found = true
     end
   end
