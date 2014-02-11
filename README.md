@@ -36,7 +36,7 @@ Clone this repository locally into some central location.  Then run its setup sc
     cd (into the newly-created repository directory)
     ./setup.sh path_to_repo_that_you_want_to_add_hooks_to
 
-This will create symbolic links in the `.git` directory of the repo that you're adding to, which will point to this githooks repo.
+This will create symbolic links in the `.git` directory of the repo that you're adding to, which will point to this githooks repo.  It will also write to the git config variable hooks.symlinksourcerepo, used by the git hooks in https://github.com/bobgilmore/dotfiles to provide effective instructions for leveraging the original installation of this repo, rather than prompting the user to re-clone.
 
 Updating the Hooks
 ==================
