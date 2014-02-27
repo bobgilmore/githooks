@@ -10,6 +10,17 @@
 #
 # Bob Gilmore (dev@bobgilmore.name)
 
+def project_type
+  toplevel = `git rev-parse --show-toplevel`.strip
+
+  gemfile = File.join(toplevel, 'Gemfile')
+  return 'ruby' if File.exist?(gemfile)
+  package_json = File.join(toplevel, 'package.json')
+  return 'node' if File.exist?(package_json)
+  return nil
+end
+
+
 ############# CONFIGURATION
 
 # The two sections of regular expressions below ("forbidden" and "warning")
@@ -66,6 +77,8 @@ NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDE
 ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
 
+type = project_type
+
 ############# END OF CONFIGURATION
 
 # Check for "forbidden" and "warning" strings
@@ -88,10 +101,14 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   end
 
   # Scan for "forbidden except in node" calls
-  FORBIDDEN_EXCEPT_IN_NODE.each do |re|
-    if added.match(re)
-      puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}\n--------------}
-      error_found = true
+  unless type == 'node'
+    FORBIDDEN_EXCEPT_IN_NODE.each do |re|
+      if added.match(re)
+        puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file} outside of Node.js projects.}
+        puts %{If this *is* a Node.js project, add a package.json file at the top level by running \n\nnpm init\n\nat the console. See\nhttps://devcenter.heroku.com/articles/getting-started-with-nodejs#declare-dependencies-with-npm for more information.}
+        puts %{--------------}
+        error_found = true
+      end
     end
   end
 
