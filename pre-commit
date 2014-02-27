@@ -20,8 +20,6 @@ FORBIDDEN = [
   /TMP_DEBUG/, # My TextExpander macros for embedding debug code always include this for easy scanning.
   />>>>>>/,    # Git conflict markers
   /<<<<<</,    # ''
-  /console\.debug/,  # JavaScript debug code that would break IE.
-  /console\.log/,    # ''
   /binding\.pry/,        # pry debugging code
   /binding\.remote_pry/, # ''
   /save_and_open_page/,  # Launchy debugging code
@@ -30,6 +28,10 @@ FORBIDDEN = [
 
 FORBIDDEN_EXCEPT_IN_FILES = [
   [ /====/, ['.md', '.mmd'] ]
+]
+
+FORBIDDEN_EXCEPT_IN_NODE = [
+  /console\.\w*/,  # JavaScript debug code that would break IE.
 ]
 
 USER = ENV["USER"]
@@ -79,6 +81,14 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   added = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
   # Scan for "forbidden" calls
   FORBIDDEN.each do |re|
+    if added.match(re)
+      puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}\n--------------}
+      error_found = true
+    end
+  end
+
+  # Scan for "forbidden except in node" calls
+  FORBIDDEN_EXCEPT_IN_NODE.each do |re|
     if added.match(re)
       puts %{Error: git pre-commit hook forbids committing lines with "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
