@@ -70,7 +70,6 @@ WARNING = [
 NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDEFINED = `git config hooks.newassetsrequireproductionchange`.strip.empty?
 NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDEFINED || (`git config hooks.newassetsrequireproductionchange`.strip == 'true')
 
-
 # Prevent inadvertent .ruby-version and .rbenv-version commits.  I rarely edit these files, so any attempt to commit is probably an accident.
 ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
@@ -152,7 +151,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
   end
 
-  # Scan for calls to "alert" that aren't flashes, in files that *aren't* in assets or vendor
+  # Scan for calls to "alert" that aren't flashes, in files that *aren't* in assets/**/vendor
   unless /assets\// =~ dir && /\/vendor/ =~ dir
     changed_lines_for_file.each do |changed_line|
       if changed_line.match(ALERT) && !changed_line.match(FLASH)
