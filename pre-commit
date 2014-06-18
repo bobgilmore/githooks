@@ -61,8 +61,7 @@ PRIVATE_KEY = [
 # Will force a rejection, but will "label" them in the error message
 # as "merely" warnings.
 WARNING = [
-  /alert/,          # I *almost* never want to check in a call to commit.
-  /logger\.debug/  # Similarly, I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
+  /logger\.debug/  # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
 ]
 
 # For particular projects - configurable on a per-project git config basis
@@ -91,6 +90,7 @@ full_diff = `git diff --cached --`
 
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
+  changed_lines_for_file = diff.split("\n").select { |x| x.start_with?("+") }
   # Scan for "forbidden" calls
   FORBIDDEN.each do |re|
     if changed_code_for_file.match(re)
@@ -144,6 +144,20 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
       if changed_code_for_file.match(re)
         puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}\n--------------}
         error_found = true
+      end
+    end
+  end
+
+  # Scan for calls to "alert" that aren't flashes.
+  flash = /flash\s*\[\s*:alert\s*\]/
+  alert = /alert/
+  dir = File.dirname(file)
+  unless /assets\// =~ dir && /\/vendor/ =~ dir
+    changed_lines_for_file.each do |changed_line|
+      if changed_line.match(alert) && !changed_line.match(flash)
+        puts %{Warning: git pre-commit hook is suspicious of committing lines with "alert" to #{file}\n--------------}
+        error_found = true
+        break
       end
     end
   end
