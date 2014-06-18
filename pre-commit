@@ -75,7 +75,10 @@ NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDE
 ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
 
-type = project_type
+FLASH = /flash\s*\[\s*:alert\s*\]/
+ALERT = /alert/
+
+TYPE = project_type
 
 ############# END OF CONFIGURATION
 
@@ -91,6 +94,8 @@ full_diff = `git diff --cached --`
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
   changed_lines_for_file = diff.split("\n").select { |x| x.start_with?("+") }
+  dir = File.dirname(file)
+
   # Scan for "forbidden" calls
   FORBIDDEN.each do |re|
     if changed_code_for_file.match(re)
@@ -100,7 +105,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   end
 
   # Scan for "forbidden except in node" calls
-  unless type == 'node'
+  unless TYPE == 'node'
     FORBIDDEN_EXCEPT_IN_NODE.each do |re|
       if changed_code_for_file.match(re)
         puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
@@ -137,9 +142,8 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
   end
 
-  # Scan for "suspect" calls in files that *aren't* in assets/**/vendor
+  # Scan for "suspect" calls in files that *aren't* in assets or vendor
   WARNING.each do |re|
-    dir = File.dirname(file)
     unless /assets\// =~ dir && /\/vendor/ =~ dir
       if changed_code_for_file.match(re)
         puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}\n--------------}
@@ -148,13 +152,10 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
   end
 
-  # Scan for calls to "alert" that aren't flashes.
-  flash = /flash\s*\[\s*:alert\s*\]/
-  alert = /alert/
-  dir = File.dirname(file)
+  # Scan for calls to "alert" that aren't flashes, in files that *aren't* in assets or vendor
   unless /assets\// =~ dir && /\/vendor/ =~ dir
     changed_lines_for_file.each do |changed_line|
-      if changed_line.match(alert) && !changed_line.match(flash)
+      if changed_line.match(ALERT) && !changed_line.match(FLASH)
         puts %{Warning: git pre-commit hook is suspicious of committing lines with "alert" to #{file}\n--------------}
         error_found = true
         break
