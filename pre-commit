@@ -74,8 +74,17 @@ NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDE
 ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
 
+# Check that we don't use spaces after opening braces or before closing braces.  This is required by one of my employers.
+REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED = `git config hooks.requirepedanticparenspacing`.strip.empty?
+REQUIRE_PEDANTIC_PAREN_SPACING = REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED || (`git config hooks.requirepedanticparenspacing`.strip == 'true')
+
 FLASH = /flash\s*\[\s*:alert\s*\]/
 ALERT = /alert/
+
+OPEN_SMOOTH_SPACE  = /\([ \t]+/
+SPACE_CLOSE_SMOOTH = /[ \t]+\)/
+OPEN_SQUARE_SPACE  = /\[[ \t]+/
+SPACE_CLOSE_SQUARE = /[ \t]+\]/
 
 TYPE = project_type
 
@@ -161,6 +170,27 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
       end
     end
   end
+
+  # Scan for bad paren or square bracket spacing, in files that *aren't* in assets/**/vendor
+  if !(/assets\// =~ dir && /\/vendor/ =~ dir) && REQUIRE_PEDANTIC_PAREN_SPACING
+    if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      error_found = true
+    end
+    if changed_code_for_file.match(SPACE_CLOSE_SMOOTH)
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      error_found = true
+    end
+    if changed_code_for_file.match(OPEN_SQUARE_SPACE)
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      error_found = true
+    end
+    if changed_code_for_file.match(SPACE_CLOSE_SQUARE)
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      error_found = true
+    end
+  end
+
 end
 
 =begin
