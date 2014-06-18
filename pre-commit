@@ -90,10 +90,10 @@ error_found = false
 full_diff = `git diff --cached --`
 
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
-  added = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
+  changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
   # Scan for "forbidden" calls
   FORBIDDEN.each do |re|
-    if added.match(re)
+    if changed_code_for_file.match(re)
       puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
     end
@@ -102,7 +102,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   # Scan for "forbidden except in node" calls
   unless type == 'node'
     FORBIDDEN_EXCEPT_IN_NODE.each do |re|
-      if added.match(re)
+      if changed_code_for_file.match(re)
         puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
         puts %{\nnpm init\n\nat the top level of the project to add a package.json file. See\nhttps://devcenter.heroku.com/articles/getting-started-with-nodejs#declare-dependencies-with-npm\nfor more information.}
         puts %{--------------}
@@ -114,7 +114,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   FORBIDDEN_EXCEPT_IN_FILES.each do |re_exts|
     unless re_exts[1].include? File.extname(file)
       re = re_exts[0]
-      if added.match(re)
+      if changed_code_for_file.match(re)
         puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file}\n--------------}
         error_found = true
       end
@@ -123,7 +123,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
 
   # Scan for probable HARD_CODED references to user's home directory
   USER_HOME.each do |re|
-    if added.match(re)
+    if changed_code_for_file.match(re)
       puts %{Error: git pre-commit hook forbids committing what looks like a hard-coded home dir: "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
     end
@@ -131,7 +131,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
 
   # Scan for private key indicators
   PRIVATE_KEY.each do |re|
-    if added.match(re)
+    if changed_code_for_file.match(re)
       puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
     end
@@ -141,7 +141,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   WARNING.each do |re|
     dir = File.dirname(file)
     unless /assets\// =~ dir && /\/vendor/ =~ dir
-      if added.match(re)
+      if changed_code_for_file.match(re)
         puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}\n--------------}
         error_found = true
       end
