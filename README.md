@@ -9,17 +9,29 @@ If you know of a common mistake, please create an issue, or better yet, a pull r
 
 pre-commit
 ----------
-1. Catches common errors, such as checking in...
+### Unconditional Checks ###
+These checks should be completely non-controversial, and are therefore non-configurable.
+
+1. Catch common errors, such as checking in...
     1. git merge conflict markers
     2. Personalized debugging statements
     3. Calls to invoke the debugger, either in Ruby or in JavaScript
-2. Catches other suspicious code, such as the addition of calls to `alert` (very uncommon for me)
+2. Catch other suspicious code, such as the addition of calls to `alert` (very uncommon for me)
 3. ~~Syntax-check all .rb files~~ Temporarily deactivated
-6. Check for probable private key commits. 
-4. *Conditionally* prevents changes to `.ruby-version` (and `.rbenv-version`).  In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.  Prevents these changes by default. 
-    * Run `git config hooks.allowrubyversionchange true` in a project directory to allow it for that particular project.
-5. *Conditionally* ensures that changes to assets are accompanied by a change to production.rb (required in my former employer's main work environment).  Does *not* prevent these changes by default.
+4. Check for probable private key commits.
+
+### Conditional Checks ###
+Conditional checks may be controversial or inappropriate for some projects, and so can be deactivated via `git config`.
+
+They are configured to be as strict as possible, and include instructions for turning them off on a project-wide or machine-wide basis.
+
+1. Prevent changes to `.ruby-version` (and `.rbenv-version`).  In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.
+    * Run `git config hooks.allowrubyversionchange true` in a project directory to always allow it.
+    * In my opinion, you should leave this alone and simply make a `--no-verify` commit when necessary.
+2. Ensure that changes to assets are accompanied by a change to production.rb (required in my former employer's main work environment).  Does *not* prevent these changes by default.
     * Run `git config hooks.newassetsrequireproductionchange true` in a project directory to prevent it for that particular project.
+3. Ensure that there are no spaces after `[` and `(`, or before `]` and `)`.
+    * Run `git config hooks.requirepedanticparenspacing false` in a project directory to always allow it.
 
 Bypassing the Checks
 --------------------
