@@ -86,7 +86,7 @@ SPACE_CLOSE_SMOOTH = /[ \t]+\)/
 OPEN_SQUARE_SPACE  = /\[[ \t]+/
 SPACE_CLOSE_SQUARE = /[ \t]+\]/
 
-TYPE = project_type
+PROJECT_TYPE = project_type
 
 ############# END OF CONFIGURATION
 
@@ -113,7 +113,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   end
 
   # Scan for "forbidden except in node" calls
-  unless TYPE == 'node'
+  unless PROJECT_TYPE == 'node'
     FORBIDDEN_EXCEPT_IN_NODE.each do |re|
       if changed_code_for_file.match(re)
         puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
