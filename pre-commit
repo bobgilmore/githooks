@@ -68,10 +68,6 @@ WARNING = [
 
 # For particular projects - configurable on a per-project git config basis
 
-# Check to ensure that if you add JavaScript or CSS, you change production.rb.  This is required by one of my employers.
-NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDEFINED = `git config hooks.newassetsrequireproductionchange`.strip.empty?
-NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE = NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE_UNDEFINED || (`git config hooks.newassetsrequireproductionchange`.strip == 'true')
-
 # Prevent inadvertent .ruby-version and .rbenv-version commits.  I rarely edit these files, so any attempt to commit is probably an accident.
 ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
@@ -215,19 +211,6 @@ end
 =end
 
 name_only = `git diff --cached --name-only`
-
-# Ensure that production.rb is changed when assets are added
-if NEW_ASSETS_REQUIRE_PRODUCTION_CHANGE
-  name_only_added = `git diff --cached --name-only --diff-filter=A`
-  has_production = name_only.include?('production.rb')
-  name_only_added.split(/\n/).each do |fil|
-    ext = File.extname(fil)
-    if (ext == '.css' || ext == '.scss' || ext == '.js' || ext == '.coffee' || ext == '.less') && !has_production
-      puts %{Error: git pre-commit hook found attempt to add #{fil} without editing production.rb\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.newassetsrequireproductionchange false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.newassetsrequireproductionchange false\nand try again.\n-------------- }
-      error_found = true
-    end
-  end
-end
 
 # Prevent changes to .ruby-version (and .rbenv-version)
 unless ALLOW_RUBY_VERSION_CHANGES
