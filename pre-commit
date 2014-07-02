@@ -75,7 +75,7 @@ WARNING = [
 ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
 
-# Check that we don't use spaces after opening braces or before closing braces.  This is required by one of my employers.
+# Check that we don't use spaces after opening braces or before closing braces.  This is required in some of my projects.
 REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED = `git config hooks.requirepedanticparenspacing`.strip.empty?
 REQUIRE_PEDANTIC_PAREN_SPACING = REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED || (`git config hooks.requirepedanticparenspacing`.strip == 'true')
 
