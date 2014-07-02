@@ -75,6 +75,11 @@ ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git con
 REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED = `git config hooks.requirepedanticparenspacing`.strip.empty?
 REQUIRE_PEDANTIC_PAREN_SPACING = REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED || (`git config hooks.requirepedanticparenspacing`.strip == 'true')
 
+# Check syntax of Ruby files.  Deactivate if your git app of choice uses a version of Ruby that doesn't support your project.
+# (i.e., on old Mac OS, apps will use Ruby 1.8, which is unaware of the Ruby 1.9 JS hash syntax.)
+CHECK_RUBY_SYNTAX_UNDEFINED = `git config hooks.checkrubysyntax`.strip.empty?
+CHECK_RUBY_SYNTAX = CHECK_RUBY_SYNTAX_UNDEFINED || (`git config hooks.checkrubysyntax`.strip == 'true')
+
 FLASH = /flash\s*\[\s*:alert\s*\]/
 ALERT = /alert/
 
@@ -190,30 +195,29 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
 
 end
 
-=begin
+name_only_array = `git diff --cached --name-only`.split(/\n/)
+
 # Syntax check .rb files.
-toplevel = `git rev-parse --show-toplevel`
-name_only = `git diff --cached --name-only`
-name_only.split(/\n/).each do |fil|
-  if File.extname(fil) == '.rb'
-    fullfile = File.join(toplevel.strip, fil)
-    if File.exist?(fullfile)
-      output = `ruby -c #{fullfile}`
-      status = $?.success?
-      unless status
-        puts %{Error: git pre-commit hook found a syntax error in #{file}}
-        error_found = true
+if CHECK_RUBY_SYNTAX
+  toplevel = `git rev-parse --show-toplevel`
+  name_only_array.each do |fil|
+    if File.extname(fil) == '.rb'
+      fullfile = File.join(toplevel.strip, fil)
+      if File.exist?(fullfile)
+        output = `ruby -c #{fullfile}`
+        status = $?.success?
+        unless status
+          puts %{Error: git pre-commit hook found a syntax error in #{fullfile}.\nIf you find that this check is flagging valid code too often, you may be using an old system git to perform the syntax check.\n\nTo permanently allow this for this repo, run\ngit config hooks.checkrubysyntax false\nand try again.\n\nTo permanently allow it for *all* repos, run\ngit config --global hooks.checkrubysyntax false\nand try again.\n-------------- }
+          error_found = true
+        end
       end
     end
   end
 end
-=end
-
-name_only = `git diff --cached --name-only`
 
 # Prevent changes to .ruby-version (and .rbenv-version)
 unless ALLOW_RUBY_VERSION_CHANGES
-  name_only.split(/\n/).each do |fil|
+  name_only_array.each do |fil|
     base = File.basename(fil)
     if base == '.ruby-version' || base == '.rbenv-version'
       puts %{Warning: git pre-commit hook found attempt to edit #{fil}.\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.allowrubyversionchange true\nand try again.\n\nTo permanently allow it for *all* repos, run\ngit config --global hooks.allowrubyversionchange true\nand try again.\n-------------- }
