@@ -36,7 +36,8 @@ FORBIDDEN = [
   /binding\.pry/,        # pry debugging code
   /binding\.remote_pry/, # ''
   /save_and_open_page/,  # Launchy debugging code
-  /debugger/             # Ruby debugging code
+  /debugger/,      # Ruby debugging code
+  /logger\.debug/  # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
 ]
 
 FORBIDDEN_EXCEPT_IN_FILES = [
@@ -60,13 +61,6 @@ USER_HOME = [
 PRIVATE_KEY = [
   /PRIVATE KEY/,
   /ssh-rsa/
-]
-
-# Things that I probably don't want to commit.
-# Will force a rejection, but will "label" them in the error message
-# as "merely" warnings.
-WARNING = [
-  /logger\.debug/  # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
 ]
 
 # For particular projects - configurable on a per-project git config basis
@@ -153,16 +147,6 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     if changed_code_for_file.match(re)
       puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
-    end
-  end
-
-  # Scan for "suspect" calls in files that *aren't* in assets or vendor
-  WARNING.each do |re|
-    unless /assets\// =~ dir && /\/vendor/ =~ dir
-      if changed_code_for_file.match(re)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with "#{$1 || $&}" to #{file}\n--------------}
-        error_found = true
-      end
     end
   end
 
