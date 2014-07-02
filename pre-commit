@@ -19,7 +19,6 @@ def project_type
   return nil
 end
 
-
 ############# CONFIGURATION
 
 # The two sections of regular expressions below ("forbidden" and "warning")
