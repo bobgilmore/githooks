@@ -19,6 +19,10 @@ def project_type
   return nil
 end
 
+def deactivation_message(to_permanently_blank, key, value)
+  %{\nTo permanently #{to_permanently_blank} for this repo, run\ngit config hooks.#{key} #{value}\nand try again.\n\nTo permanently #{to_permanently_blank} it for *all* repos, run\ngit config --global hooks.#{key} #{value}\nand try again.\n--------------}
+end
+
 ############# CONFIGURATION
 
 # The two sections of regular expressions below ("forbidden" and "warning")
@@ -176,19 +180,23 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   # Scan for bad paren or square bracket spacing, in files that *aren't* in assets/**/vendor
   if REQUIRE_PEDANTIC_PAREN_SPACING && !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
     if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.}
+      puts deactivation_message("allow", "requirepedanticparenspacing", false)
       error_found = true
     end
     if changed_code_for_file.match(SPACE_CLOSE_SMOOTH)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.}
+      puts deactivation_message("allow", "requirepedanticparenspacing", false)
       error_found = true
     end
     if changed_code_for_file.match(OPEN_SQUARE_SPACE)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.}
+      puts deactivation_message("allow", "requirepedanticparenspacing", false)
       error_found = true
     end
     if changed_code_for_file.match(SPACE_CLOSE_SQUARE)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.requirepedanticparenspacing false\nand try again.\n\nTo permanently allow this for *all* repos, run\ngit config --global hooks.requirepedanticparenspacing false\nand try again.\n--------------}
+      puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.}
+      puts deactivation_message("allow", "requirepedanticparenspacing", false)
       error_found = true
     end
   end
@@ -207,7 +215,8 @@ if CHECK_RUBY_SYNTAX
         output = `ruby -c #{fullfile}`
         status = $?.success?
         unless status
-          puts %{Error: git pre-commit hook found a syntax error in #{fullfile}.\nIf you find that this check is flagging valid code too often, you may be using an old system git to perform the syntax check.\n\nTo permanently allow this for this repo, run\ngit config hooks.checkrubysyntax false\nand try again.\n\nTo permanently allow it for *all* repos, run\ngit config --global hooks.checkrubysyntax false\nand try again.\n-------------- }
+          puts %{Error: git pre-commit hook found a syntax error in #{fullfile}.\nIf you find that this check is flagging valid code too often, you may be using an old system git to perform the syntax check.}
+          puts deactivation_message("deactivate the syntax check", "checkrubysyntax", false)
           error_found = true
         end
       end
@@ -220,7 +229,8 @@ unless ALLOW_RUBY_VERSION_CHANGES
   name_only_array.each do |fil|
     base = File.basename(fil)
     if base == '.ruby-version' || base == '.rbenv-version'
-      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.\nThis may be OK, or not, depending on your project requirements.\n\nTo permanently allow this for this repo, run\ngit config hooks.allowrubyversionchange true\nand try again.\n\nTo permanently allow it for *all* repos, run\ngit config --global hooks.allowrubyversionchange true\nand try again.\n-------------- }
+      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.\nThis may be OK, or not, depending on your project requirements.}
+      puts deactivation_message("allow", "allowrubyversionchange", true)
       error_found = true
     end
   end
