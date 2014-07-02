@@ -29,7 +29,7 @@ end
 # will trigger a commit failure, *if* they are found on an added or edited line.
 
 # "Forbidden" regular expressions
-FORBIDDEN = [
+FORBIDDEN_STRINGS = [
   /TMP_DEBUG/, # My TextExpander macros for embedding debug code always include this for easy scanning.
   />>>>>>/,    # Git conflict markers
   /<<<<<</,    # ''
@@ -40,13 +40,13 @@ FORBIDDEN = [
   /logger\.debug/  # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
 ]
 
-FORBIDDEN_EXCEPT_IN_FILES = [
+FORBIDDEN_STRINGS_EXCEPT_IN_FILES = [
   [ /====/, ['.md', '.mmd'] ]
 ]
 
 SHELL_SCRIPT_EXTENSIONS = [ '.sh', '.bash' ]
 
-FORBIDDEN_EXCEPT_IN_NODE = [
+FORBIDDEN_STRINGS_EXCEPT_IN_NODE = [
   /console\.\w*/,  # JavaScript debug code that would break IE.
 ]
 
@@ -58,7 +58,7 @@ USER_HOME = [
 ]
 
 # Warning signs that someone is committing a private key
-PRIVATE_KEY = [
+PRIVATE_KEY_INDICATORS = [
   /PRIVATE KEY/,
   /ssh-rsa/
 ]
@@ -105,7 +105,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   dir = File.dirname(file)
 
   # Scan for "forbidden" calls
-  FORBIDDEN.each do |re|
+  FORBIDDEN_STRINGS.each do |re|
     if changed_code_for_file.match(re)
       puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
@@ -114,7 +114,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
 
   # Scan for "forbidden except in node" calls
   unless PROJECT_TYPE == 'node'
-    FORBIDDEN_EXCEPT_IN_NODE.each do |re|
+    FORBIDDEN_STRINGS_EXCEPT_IN_NODE.each do |re|
       if changed_code_for_file.match(re)
         puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
         puts %{\nnpm init\n\nat the top level of the project to add a package.json file. See\nhttps://devcenter.heroku.com/articles/getting-started-with-nodejs#declare-dependencies-with-npm\nfor more information.}
@@ -124,7 +124,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
   end
 
-  FORBIDDEN_EXCEPT_IN_FILES.each do |re_exts|
+  FORBIDDEN_STRINGS_EXCEPT_IN_FILES.each do |re_exts|
     unless re_exts[1].include? File.extname(file)
       re = re_exts[0]
       if changed_code_for_file.match(re)
@@ -143,7 +143,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   end
 
   # Scan for private key indicators
-  PRIVATE_KEY.each do |re|
+  PRIVATE_KEY_INDICATORS.each do |re|
     if changed_code_for_file.match(re)
       puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}\n--------------}
       error_found = true
