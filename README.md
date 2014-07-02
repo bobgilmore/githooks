@@ -1,11 +1,11 @@
 githooks
 ========
 
-My personal githooks, which help me avoid silly or obvious mistakes.
+My personal githooks, which help me avoid mistakes and adhere to  coding guidelines.
 
-I started writing these at a full-stack Ruby on Rails -based position, so most of the checks are for Ruby, JavaScript, or general git use.  I've sprinkled a few checks here and there for problems in other languages, and I'll add more.
+I started writing these for use in full-stack Ruby on Rails coding, so most of the checks are for languages in a typical RoR stack.
 
-If you know of a common mistake, please create an issue, or better yet, a pull request.  See [Advice for Committers](#advice-for-committers) below.
+If you would like to add code to detect another common problem, please create an issue, or better yet, a pull request.  See [Advice for Committers](#advice-for-committers) below.
 
 pre-commit
 ----------
@@ -25,11 +25,13 @@ Conditional checks may be controversial or inappropriate for some projects, and 
 
 They are configured to be as strict as possible, and include instructions for turning them off on a project-wide or machine-wide basis.
 
-1. Prevent changes to `.ruby-version` (and `.rbenv-version`).  In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.
-    * Run `git config hooks.allowrubyversionchange true` in a project directory to always allow it.
-    * In my opinion, you should leave this alone and simply make a `--no-verify` commit when necessary.
-2. Ensure that changes to assets are accompanied by a change to production.rb (required in my former employer's main work environment).  Does *not* prevent these changes by default.
-    * Run `git config hooks.newassetsrequireproductionchange true` in a project directory to prevent it for that particular project.
+1. Check the syntax of Ruby files using ruby -c.
+    * In some circumatances (i.e., old Mac OS X versions), an app may use an old version of git that cannot handle newer syntax, such as the Ruby 1.9 JS hash syntax.  This will result in bogus flags.
+    * Run `git config hooks.checkrubysyntax false` in a project directory to deactivate the check.
+2. Prevent changes to `.ruby-version` (and `.rbenv-version`).  
+    * In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.
+    * In my opinion, you should leave this alone and simply make a `--no-verify` commit when necessary. (See below.)
+    * If you insist on deactivating the check, run `git config hooks.allowrubyversionchange true` in a project directory.
 3. Ensure that there are no spaces after `[` and `(`, or before `]` and `)`.
     * Run `git config hooks.requirepedanticparenspacing false` in a project directory to always allow it.
 
@@ -66,7 +68,9 @@ Add Repo-Specific Changes *Conditionally*
 ---------
 Since all of your affected repos have symlinks to one shared set of hooks, don't make project-specific changes to the hook files.  Rather, make the behavior change based on an **optional** git configuration variable, and then set that variable for the projects where it's necessary.
 
-See how I handle `newassetsrequireproductionchange` in the `pre-commit` file for an example of how to do this.
+See how I handle `checkrubysyntax` in the `pre-commit` file for an example of how to do this.
+
+I think that it's best to add a new checkin its "most stringent" setting, so that people can become aware of if and make an informed decision to deactivate it.
 
 Writing Checks to Run (or Ignore) for Some Extensions or Directories
 ---------
