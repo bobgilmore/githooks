@@ -1,11 +1,11 @@
 githooks
 ========
 
-My personal githooks, which help me avoid silly or obvious mistakes.
+My personal githooks, which help me avoid mistakes and adhere to  coding guidelines.
 
-I started writing these at a full-stack Ruby on Rails -based position, so most of the checks are for Ruby, JavaScript, or general git use.  I've sprinkled a few checks here and there for problems in other languages, and I'll add more.
+I started writing these for use in full-stack Ruby on Rails coding, so most of the checks are for languages in a typical RoR stack.
 
-If you know of a common mistake, please create an issue, or better yet, a pull request.  See [Advice for Committers](#advice-for-committers) below.
+If you would like to add code to detect another common problem, please create an issue, or better yet, a pull request.  See [Advice for Committers](#advice-for-committers) below.
 
 pre-commit
 ----------
@@ -68,7 +68,9 @@ Add Repo-Specific Changes *Conditionally*
 ---------
 Since all of your affected repos have symlinks to one shared set of hooks, don't make project-specific changes to the hook files.  Rather, make the behavior change based on an **optional** git configuration variable, and then set that variable for the projects where it's necessary.
 
-See how I handle `newassetsrequireproductionchange` in the `pre-commit` file for an example of how to do this.
+See how I handle `checkrubysyntax` in the `pre-commit` file for an example of how to do this.
+
+I think that it's best to add a new checkin its "most stringent" setting, so that people can become aware of if and make an informed decision to deactivate it.
 
 Writing Checks to Run (or Ignore) for Some Extensions or Directories
 ---------
