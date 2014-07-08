@@ -70,8 +70,8 @@ ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
 
 # Check that we don't use spaces after opening braces or before closing braces.  This is required in some of my projects.
-REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED = `git config hooks.requirepedanticparenspacing`.strip.empty?
-REQUIRE_PEDANTIC_PAREN_SPACING = REQUIRE_PEDANTIC_PAREN_SPACING_UNDEFINED || (`git config hooks.requirepedanticparenspacing`.strip == 'true')
+REQUIRE_STRICT_PAREN_SPACING_UNDEFINED = `git config hooks.requirestrictparenspacing`.strip.empty?
+REQUIRE_STRICT_PAREN_SPACING = REQUIRE_STRICT_PAREN_SPACING_UNDEFINED || (`git config hooks.requirestrictparenspacing`.strip == 'true')
 
 # Check syntax of Ruby files.  Deactivate if your git app of choice uses a version of Ruby that doesn't support your project.
 # (i.e., on old Mac OS, apps will use Ruby 1.8, which is unaware of the Ruby 1.9 JS hash syntax.)
@@ -162,25 +162,25 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
   end
 
   # Scan for bad paren or square bracket spacing, in files that *aren't* in assets/**/vendor
-  if REQUIRE_PEDANTIC_PAREN_SPACING && !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
+  if REQUIRE_STRICT_PAREN_SPACING && !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
     if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
       puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirepedanticparenspacing", false)
+      puts deactivation_message("allow", "requirestrictparenspacing", false)
       error_found = true
     end
     if changed_code_for_file.match(SPACE_CLOSE_SMOOTH)
       puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirepedanticparenspacing", false)
+      puts deactivation_message("allow", "requirestrictparenspacing", false)
       error_found = true
     end
     if changed_code_for_file.match(OPEN_SQUARE_SPACE)
       puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirepedanticparenspacing", false)
+      puts deactivation_message("allow", "requirestrictparenspacing", false)
       error_found = true
     end
     if changed_code_for_file.match(SPACE_CLOSE_SQUARE)
       puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirepedanticparenspacing", false)
+      puts deactivation_message("allow", "requirestrictparenspacing", false)
       error_found = true
     end
   end
