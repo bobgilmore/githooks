@@ -36,7 +36,8 @@ FORBIDDEN_STRINGS = [
   /binding\.pry/,        # pry debugging code
   /binding\.remote_pry/, # ''
   /save_and_open_page/,  # Launchy debugging code
-  /debugger/,      # Ruby debugging code
+  /debugger/,      # Ruby < 2.0 debugging code
+  /byebug/,        # Ruby >= 2.0 debugging code
   /logger\.debug/  # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
 ]
 
