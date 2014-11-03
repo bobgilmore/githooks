@@ -32,14 +32,17 @@ end
 FORBIDDEN_STRINGS = [
   /TMP_DEBUG/, # My TextExpander macros for embedding debug code always include this for easy scanning.
   />>>>>>/,    # Git conflict markers
-  /<<<<<</,    # ''
+  /<<<<<</,    # "
   /binding\.pry/,        # pry debugging code
-  /binding\.remote_pry/, # ''
+  /binding\.remote_pry/, # "
   /save_and_open_page/,  # Launchy debugging code
-  /debugger/,      # Ruby < 2.0 debugging code
+  /debugger/,      # Ruby < 2.0 debugging code, JS debugging code.
   /byebug/,        # Ruby >= 2.0 debugging code
   /logger\.debug/, # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
   /====/,          # Git merge conflict marker
+  /save_and_open_screenshot/, # Capybara debugging
+  /save_screenshot/,          # "
+  /save_and_open_page/        # "
 ]
 
 NON_CHECKED_FILE_EXTENSIONS = [
