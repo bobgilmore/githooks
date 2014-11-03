@@ -38,11 +38,14 @@ FORBIDDEN_STRINGS = [
   /save_and_open_page/,  # Launchy debugging code
   /debugger/,      # Ruby < 2.0 debugging code
   /byebug/,        # Ruby >= 2.0 debugging code
-  /logger\.debug/  # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
+  /logger\.debug/, # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
+  /====/,          # Git merge conflict marker
 ]
 
-FORBIDDEN_STRINGS_EXCEPT_IN_FILES = [
-  [ /====/, ['.md', '.mmd'] ]
+NON_CHECKED_FILE_EXTENSIONS = [
+  '.md',
+  '.mmd',
+  '.txt'
 ]
 
 SHELL_SCRIPT_EXTENSIONS = [ '.sh', '.bash', '' ]
@@ -102,46 +105,6 @@ full_diff = `git diff --cached --`
 
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
-  changed_lines_for_file = diff.split("\n").select { |x| x.start_with?("+") }
-  dir = File.dirname(file)
-
-  # Scan for "forbidden" calls
-  FORBIDDEN_STRINGS.each do |re|
-    if changed_code_for_file.match(re)
-      puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file}\n--------------}
-      error_found = true
-    end
-  end
-
-  # Scan for "forbidden except in node" calls
-  unless PROJECT_TYPE == 'node'
-    FORBIDDEN_STRINGS_EXCEPT_IN_NODE.each do |re|
-      if changed_code_for_file.match(re)
-        puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
-        puts %{\nnpm init\n\nat the top level of the project to add a package.json file. See\nhttps://devcenter.heroku.com/articles/getting-started-with-nodejs#declare-dependencies-with-npm\nfor more information.}
-        puts %{--------------}
-        error_found = true
-      end
-    end
-  end
-
-  FORBIDDEN_STRINGS_EXCEPT_IN_FILES.each do |re_exts|
-    unless re_exts[1].include? File.extname(file)
-      re = re_exts[0]
-      if changed_code_for_file.match(re)
-        puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file}\n--------------}
-        error_found = true
-      end
-    end
-  end
-
-  # Scan for probable HARD_CODED references to user's home directory
-  USER_HOME.each do |re|
-    if changed_code_for_file.match(re)
-      puts %{Error: git pre-commit hook forbids committing what looks like a hard-coded home dir: "#{$1 || $&}" to #{file}\n--------------}
-      error_found = true
-    end
-  end
 
   # Scan for private key indicators
   PRIVATE_KEY_INDICATORS.each do |re|
@@ -151,41 +114,73 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
   end
 
-  # Scan for calls to "alert" that aren't flashes, in files that *aren't* in assets/**/vendor
-  unless /assets\// =~ dir && /\/vendor/ =~ dir
-    changed_lines_for_file.each do |changed_line|
-      if changed_line.match(ALERT) && !changed_line.match(FLASH)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with "alert" to #{file}\n--------------}
+  unless NON_CHECKED_FILE_EXTENSIONS.include? File.extname(file)
+    changed_lines_for_file = diff.split("\n").select { |x| x.start_with?("+") }
+    dir = File.dirname(file)
+
+    # Scan for "forbidden" calls
+    FORBIDDEN_STRINGS.each do |re|
+      if changed_code_for_file.match(re)
+        puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file}\n--------------}
         error_found = true
-        break
+      end
+    end
+
+    # Scan for "forbidden except in node" calls
+    unless PROJECT_TYPE == 'node'
+      FORBIDDEN_STRINGS_EXCEPT_IN_NODE.each do |re|
+        if changed_code_for_file.match(re)
+          puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
+          puts %{\nnpm init\n\nat the top level of the project to add a package.json file. See\nhttps://devcenter.heroku.com/articles/getting-started-with-nodejs#declare-dependencies-with-npm\nfor more information.}
+          puts %{--------------}
+          error_found = true
+        end
+      end
+    end
+
+    # Scan for probable HARD_CODED references to user's home directory
+    USER_HOME.each do |re|
+      if changed_code_for_file.match(re)
+        puts %{Error: git pre-commit hook forbids committing what looks like a hard-coded home dir: "#{$1 || $&}" to #{file}\n--------------}
+        error_found = true
+      end
+    end
+
+    # Scan for calls to "alert" that aren't flashes, in files that *aren't* in assets/**/vendor
+    unless /assets\// =~ dir && /\/vendor/ =~ dir
+      changed_lines_for_file.each do |changed_line|
+        if changed_line.match(ALERT) && !changed_line.match(FLASH)
+          puts %{Warning: git pre-commit hook is suspicious of committing lines with "alert" to #{file}\n--------------}
+          error_found = true
+          break
+        end
+      end
+    end
+
+    # Scan for bad paren or square bracket spacing, in files that *aren't* in assets/**/vendor
+    if REQUIRE_STRICT_PAREN_SPACING && !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
+      if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
+        puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.}
+        puts deactivation_message("allow", "requirestrictparenspacing", false)
+        error_found = true
+      end
+      if changed_code_for_file.match(SPACE_CLOSE_SMOOTH)
+        puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.}
+        puts deactivation_message("allow", "requirestrictparenspacing", false)
+        error_found = true
+      end
+      if changed_code_for_file.match(OPEN_SQUARE_SPACE)
+        puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.}
+        puts deactivation_message("allow", "requirestrictparenspacing", false)
+        error_found = true
+      end
+      if changed_code_for_file.match(SPACE_CLOSE_SQUARE)
+        puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.}
+        puts deactivation_message("allow", "requirestrictparenspacing", false)
+        error_found = true
       end
     end
   end
-
-  # Scan for bad paren or square bracket spacing, in files that *aren't* in assets/**/vendor
-  if REQUIRE_STRICT_PAREN_SPACING && !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
-    if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirestrictparenspacing", false)
-      error_found = true
-    end
-    if changed_code_for_file.match(SPACE_CLOSE_SMOOTH)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirestrictparenspacing", false)
-      error_found = true
-    end
-    if changed_code_for_file.match(OPEN_SQUARE_SPACE)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirestrictparenspacing", false)
-      error_found = true
-    end
-    if changed_code_for_file.match(SPACE_CLOSE_SQUARE)
-      puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "requirestrictparenspacing", false)
-      error_found = true
-    end
-  end
-
 end
 
 name_only_array = `git diff --cached --name-only`.split(/\n/)
