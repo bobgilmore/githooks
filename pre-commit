@@ -104,7 +104,7 @@ PROJECT_TYPE = project_type
 # so that anyone calling --no-verify has been informed of all problems first.
 error_found = false
 
-full_diff = `git diff --cached --`
+full_diff = `git diff --cached --`.encode("UTF-8")
 
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
