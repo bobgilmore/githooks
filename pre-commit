@@ -10,40 +10,11 @@
 #
 # Bob Gilmore (dev@bobgilmore.name)
 
-def project_type
-  toplevel = `git rev-parse --show-toplevel`.strip
-  gemfile = File.join(toplevel, 'Gemfile')
-  return 'ruby' if File.exist?(gemfile)
-  package_json = File.join(toplevel, 'package.json')
-  return 'node' if File.exist?(package_json)
-  return nil
-end
+load "#{File.dirname(__FILE__)}/pre_commit_helper.rb"
+load "#{File.dirname(__FILE__)}/checker_results.rb"
+Dir[File.dirname(__FILE__) + "/*_checker.rb"].each { |f| load f }
 
-def deactivation_message(to_permanently_blank, key, value)
-  %{\nTo permanently #{to_permanently_blank} for this repo, run\ngit config hooks.#{key} #{value}\nand try again.\n\nTo permanently #{to_permanently_blank} it for *all* repos, run\ngit config --global hooks.#{key} #{value}\nand try again.\n--------------}
-end
-
-############# CONFIGURATION
-
-# The two sections of regular expressions below ("forbidden" and "warning")
-# will trigger a commit failure, *if* they are found on an added or edited line.
-
-# "Forbidden" regular expressions
-FORBIDDEN_STRINGS = [
-  /TMP_DEBUG/, # My TextExpander macros for embedding debug code always include this for easy scanning.
-  />>>>>>/,    # Git conflict markers
-  /<<<<<</,    # "
-  /binding\.pry/,        # pry debugging code
-  /binding\.remote_pry/, # "
-  /save_and_open_page/,  # Launchy debugging code
-  /debugger/,      # Ruby < 2.0 debugging code, JS debugging code.
-  /byebug/,        # Ruby >= 2.0 debugging code
-  /logger\.debug/, # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
-  /====/,          # Git merge conflict marker
-  /save_and_open_screenshot/, # Capybara debugging
-  /save_screenshot/,          # "
-  /save_and_open_page/        # "
-]
+include PreCommitHelper
 
 NON_CHECKED_FILE_EXTENSIONS = [
   '.md',
@@ -51,176 +22,40 @@ NON_CHECKED_FILE_EXTENSIONS = [
   '.txt'
 ]
 
-SHELL_SCRIPT_EXTENSIONS = [ '.sh', '.bash', '' ]
+PROJECT_TYPE = PreCommitHelper::project_type
 
-FORBIDDEN_STRINGS_EXCEPT_IN_NODE = [
-  /console\.\w*/,  # JavaScript debug code that would break IE.
-]
-
-USER = ENV["USER"]
-USER_HOME = [
-  Regexp.new("/home/#{USER}"),        # Hard-coded path to user's HOME
-  Regexp.new("/Users/#{USER}"),       # ''
-  Regexp.new("/export/home/#{USER}")  # '' (for a current work config)
-]
-
-# Warning signs that someone is committing a private key
-PRIVATE_KEY_INDICATORS = [
-  /PRIVATE KEY/,
-  /ssh-rsa/
-]
-
-# For particular projects - configurable on a per-project git config basis
-
-# Prevent inadvertent .ruby-version and .rbenv-version commits.  I rarely edit these files, so any attempt to commit is probably an accident.
-ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
-ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
-
-# Check that we don't use spaces after opening braces or before closing braces.  This is required in some of my projects.
-REQUIRE_STRICT_PAREN_SPACING_UNDEFINED = `git config hooks.requirestrictparenspacing`.strip.empty?
-REQUIRE_STRICT_PAREN_SPACING = REQUIRE_STRICT_PAREN_SPACING_UNDEFINED || (`git config hooks.requirestrictparenspacing`.strip == 'true')
-
-# Check syntax of Ruby files.  Deactivate if your git app of choice uses a version of Ruby that doesn't support your project.
-# (i.e., on old Mac OS, apps will use Ruby 1.8, which is unaware of the Ruby 1.9 JS hash syntax.)
-CHECK_RUBY_SYNTAX_UNDEFINED = `git config hooks.checkrubysyntax`.strip.empty?
-CHECK_RUBY_SYNTAX = CHECK_RUBY_SYNTAX_UNDEFINED || (`git config hooks.checkrubysyntax`.strip == 'true')
-
-FLASH = /flash\s*\[\s*:alert\s*\]/
-ALERT = /alert/
-
-OPEN_SMOOTH_SPACE  = /\([ \t]+/
-SPACE_CLOSE_SMOOTH = /[ \t]+\)/
-OPEN_SQUARE_SPACE  = /\[[ \t]+/
-SPACE_CLOSE_SQUARE = /[ \t]+\]/
-
-PROJECT_TYPE = project_type
-
-############# END OF CONFIGURATION
-
-# Check for "forbidden" and "warning" strings
+res = CheckerResults.new
 
 # Loop over ALL errors and warnings and return ALL problems.
 # I want to report on *all* problems that exist in the commit before aborting,
 # so that anyone calling --no-verify has been informed of all problems first.
-error_found = false
 
 full_diff = `git diff --cached --`.encode("UTF-8")
 
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
-  changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
-
-  # Scan for private key indicators
-  PRIVATE_KEY_INDICATORS.each do |re|
-    if changed_code_for_file.match(re)
-      puts %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{file}\n--------------}
-      error_found = true
-    end
-  end
-
   unless NON_CHECKED_FILE_EXTENSIONS.include? File.extname(file)
-    changed_lines_for_file = diff.split("\n").select { |x| x.start_with?("+") }
     dir = File.dirname(file)
+    
+    changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
+    changed_lines_for_file = diff.split("\n").select { |x| x.start_with?("+") }
 
-    # Scan for "forbidden" calls
-    FORBIDDEN_STRINGS.each do |re|
-      if changed_code_for_file.match(re)
-        puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file}\n--------------}
-        error_found = true
-      end
-    end
-
-    # Scan for "forbidden except in node" calls
-    unless PROJECT_TYPE == 'node'
-      FORBIDDEN_STRINGS_EXCEPT_IN_NODE.each do |re|
-        if changed_code_for_file.match(re)
-          puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
-          puts %{\nnpm init\n\nat the top level of the project to add a package.json file. See\nhttps://devcenter.heroku.com/articles/getting-started-with-nodejs#declare-dependencies-with-npm\nfor more information.}
-          puts %{--------------}
-          error_found = true
-        end
-      end
-    end
-
-    # Scan for probable HARD_CODED references to user's home directory
-    USER_HOME.each do |re|
-      if changed_code_for_file.match(re)
-        puts %{Error: git pre-commit hook forbids committing what looks like a hard-coded home dir: "#{$1 || $&}" to #{file}\n--------------}
-        error_found = true
-      end
-    end
-
-    # Scan for calls to "alert" that aren't flashes, in files that *aren't* in assets/**/vendor
-    unless /assets\// =~ dir && /\/vendor/ =~ dir
-      changed_lines_for_file.each do |changed_line|
-        if changed_line.match(ALERT) && !changed_line.match(FLASH)
-          puts %{Warning: git pre-commit hook is suspicious of committing lines with "alert" to #{file}\n--------------}
-          error_found = true
-          break
-        end
-      end
-    end
-
-    # Scan for bad paren or square bracket spacing, in files that *aren't* in assets/**/vendor
-    if REQUIRE_STRICT_PAREN_SPACING && !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
-      if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
-      if changed_code_for_file.match(SPACE_CLOSE_SMOOTH)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
-      if changed_code_for_file.match(OPEN_SQUARE_SPACE)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
-      if changed_code_for_file.match(SPACE_CLOSE_SQUARE)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
-    end
+    res.record(ForbiddenStringChecker.new(file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(PrivateKeyChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(UserHomeChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(AlertChecker.new(directory: dir, file: file, changes: changed_lines_for_file))
+    res.record(StrictParenSpacingChecker.new(directory: dir, file: file, changes: changed_code_for_file))
   end
 end
 
 name_only_array = `git diff --cached --name-only`.split(/\n/)
+toplevel = `git rev-parse --show-toplevel`
 
-# Syntax check .rb files.
-if CHECK_RUBY_SYNTAX
-  toplevel = `git rev-parse --show-toplevel`
-  name_only_array.each do |fil|
-    if File.extname(fil) == '.rb'
-      fullfile = File.join(toplevel.strip, fil)
-      if File.exist?(fullfile)
-        output = `ruby -c #{fullfile}`
-        status = $?.success?
-        unless status
-          puts %{Error: git pre-commit hook found a syntax error in #{fullfile}.\nIf you find that this check is flagging valid code too often, you may be using an old system git to perform the syntax check.}
-          puts deactivation_message("deactivate the syntax check", "checkrubysyntax", false)
-          error_found = true
-        end
-      end
-    end
-  end
-end
+res.record(SyntaxRubyChecker.new(toplevel: toplevel, files: name_only_array))
+res.record(RubyVersionChecker.new(files: name_only_array))
 
-# Prevent changes to .ruby-version (and .rbenv-version)
-unless ALLOW_RUBY_VERSION_CHANGES
-  name_only_array.each do |fil|
-    base = File.basename(fil)
-    if base == '.ruby-version' || base == '.rbenv-version'
-      puts %{Warning: git pre-commit hook found attempt to edit #{fil}.\nThis may be OK, or not, depending on your project requirements.}
-      puts deactivation_message("allow", "allowrubyversionchange", true)
-      error_found = true
-    end
-  end
-end
-
-# Finally, report errors
-if error_found
+# Report errors and fail the commit if necessary
+if res.errors?
+  puts(res)
   puts "To commit anyway, use --no-verify"
   exit 1
 end
