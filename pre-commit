@@ -10,8 +10,8 @@
 #
 # Bob Gilmore (dev@bobgilmore.name)
 
-load './pre_commit_helper.rb'
-load './strict_paren_spacing_checker.rb'
+load "#{File.dirname(__FILE__)}/pre_commit_helper.rb"
+load "#{File.dirname(__FILE__)}/strict_paren_spacing_checker.rb"
 
 ############# CONFIGURATION
 
