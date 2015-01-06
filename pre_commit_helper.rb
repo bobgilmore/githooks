@@ -13,4 +13,8 @@ class PreCommitHelper
     %{\nTo permanently #{to_permanently_blank} for this repo, run\ngit config hooks.#{key} #{value}\nand try again.\n\nTo permanently #{to_permanently_blank} it for *all* repos, run\ngit config --global hooks.#{key} #{value}\nand try again.\n--------------}
   end
 
+  def self.directory_excluded_from_checks?(directory)
+    /assets\// =~ directory && /\/vendor/ =~ directory
+  end
+
 end

@@ -14,7 +14,7 @@ class StrictParenSpacingChecker
   end
 
   def check(dir, file, changed_code_for_file)
-    if !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
+    if !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !PreCommitHelper::directory_excluded_from_checks?(dir)
       if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
         puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.}
         puts PreCommitHelper::deactivation_message("allow", "requirestrictparenspacing", false)
