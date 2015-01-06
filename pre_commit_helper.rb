@@ -1,4 +1,4 @@
-class PreCommit
+class PreCommitHelper
 
   def self.project_type
     toplevel = `git rev-parse --show-toplevel`.strip

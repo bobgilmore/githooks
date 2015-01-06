@@ -10,7 +10,8 @@
 #
 # Bob Gilmore (dev@bobgilmore.name)
 
-load './pre_commit.rb'
+load './pre_commit_helper.rb'
+load './strict_paren_spacing_checker.rb'
 
 ############# CONFIGURATION
 
@@ -40,8 +41,6 @@ NON_CHECKED_FILE_EXTENSIONS = [
   '.txt'
 ]
 
-SHELL_SCRIPT_EXTENSIONS = [ '.sh', '.bash', '' ]
-
 FORBIDDEN_STRINGS_EXCEPT_IN_NODE = [
   /console\.\w*/,  # JavaScript debug code that would break IE.
 ]
@@ -65,10 +64,6 @@ PRIVATE_KEY_INDICATORS = [
 ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
 ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
 
-# Check that we don't use spaces after opening braces or before closing braces.  This is required in some of my projects.
-REQUIRE_STRICT_PAREN_SPACING_UNDEFINED = `git config hooks.requirestrictparenspacing`.strip.empty?
-REQUIRE_STRICT_PAREN_SPACING = REQUIRE_STRICT_PAREN_SPACING_UNDEFINED || (`git config hooks.requirestrictparenspacing`.strip == 'true')
-
 # Check syntax of Ruby files.  Deactivate if your git app of choice uses a version of Ruby that doesn't support your project.
 # (i.e., on old Mac OS, apps will use Ruby 1.8, which is unaware of the Ruby 1.9 JS hash syntax.)
 CHECK_RUBY_SYNTAX_UNDEFINED = `git config hooks.checkrubysyntax`.strip.empty?
@@ -76,13 +71,6 @@ CHECK_RUBY_SYNTAX = CHECK_RUBY_SYNTAX_UNDEFINED || (`git config hooks.checkrubys
 
 FLASH = /flash\s*\[\s*:alert\s*\]/
 ALERT = /alert/
-
-OPEN_SMOOTH_SPACE  = /\([ \t]+/
-SPACE_CLOSE_SMOOTH = /[ \t]+\)/
-OPEN_SQUARE_SPACE  = /\[[ \t]+/
-SPACE_CLOSE_SQUARE = /[ \t]+\]/
-
-PROJECT_TYPE = PreCommit::project_type
 
 ############# END OF CONFIGURATION
 
@@ -119,7 +107,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
 
     # Scan for "forbidden except in node" calls
-    unless PROJECT_TYPE == 'node'
+    unless PreCommitHelper::project_type == 'node'
       FORBIDDEN_STRINGS_EXCEPT_IN_NODE.each do |re|
         if changed_code_for_file.match(re)
           puts %{Error: git pre-commit hook forbids committing "#{$1 || $&}" to #{file} outside of Node.js projects. If this *is* a Node project, run}
@@ -149,28 +137,9 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
       end
     end
 
-    # Scan for bad paren or square bracket spacing, in files that *aren't* in assets/**/vendor
-    if REQUIRE_STRICT_PAREN_SPACING && !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !(/assets\// =~ dir && /\/vendor/ =~ dir)
-      if changed_code_for_file.match(OPEN_SMOOTH_SPACE)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with "( " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
-      if changed_code_for_file.match(SPACE_CLOSE_SMOOTH)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with " )" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
-      if changed_code_for_file.match(OPEN_SQUARE_SPACE)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with "[ " to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
-      if changed_code_for_file.match(SPACE_CLOSE_SQUARE)
-        puts %{Warning: git pre-commit hook is suspicious of committing lines with " ]" to #{file}\nThis may be OK, or not, depending on your project requirements.}
-        puts deactivation_message("allow", "requirestrictparenspacing", false)
-        error_found = true
-      end
+    if StrictParenSpacingChecker::necessary?
+      checker = StrictParenSpacingChecker.new
+      error_found = true if checker.check(dir, file, changed_code_for_file)
     end
   end
 end
