@@ -61,13 +61,13 @@ PRIVATE_KEY_INDICATORS = [
 # For particular projects - configurable on a per-project git config basis
 
 # Prevent inadvertent .ruby-version and .rbenv-version commits.  I rarely edit these files, so any attempt to commit is probably an accident.
-ALLOW_RUBY_VERSION_CHANGES_UNDEFINED = `git config hooks.allowrubyversionchange`.strip.empty?
-ALLOW_RUBY_VERSION_CHANGES = !ALLOW_RUBY_VERSION_CHANGES_UNDEFINED && ( `git config hooks.allowrubyversionchange`.strip == 'true')
+ALLOW_RUBY_VERSION_CHANGES_CONFIG = `git config hooks.allowrubyversionchange`.strip
+FORBID_RUBY_VERSION_CHANGES = ALLOW_RUBY_VERSION_CHANGES_CONFIG.empty? || (ALLOW_RUBY_VERSION_CHANGES_CONFIG != 'true')
 
 # Check syntax of Ruby files.  Deactivate if your git app of choice uses a version of Ruby that doesn't support your project.
 # (i.e., on old Mac OS, apps will use Ruby 1.8, which is unaware of the Ruby 1.9 JS hash syntax.)
-CHECK_RUBY_SYNTAX_UNDEFINED = `git config hooks.checkrubysyntax`.strip.empty?
-CHECK_RUBY_SYNTAX = CHECK_RUBY_SYNTAX_UNDEFINED || (`git config hooks.checkrubysyntax`.strip == 'true')
+CHECK_RUBY_CONFIG = `git config hooks.checkrubysyntax`.strip
+CHECK_RUBY_SYNTAX = CHECK_RUBY_CONFIG.empty? || (CHECK_RUBY_CONFIG == 'true')
 
 FLASH = /flash\s*\[\s*:alert\s*\]/
 ALERT = /alert/
@@ -166,7 +166,7 @@ if CHECK_RUBY_SYNTAX
 end
 
 # Prevent changes to .ruby-version (and .rbenv-version)
-unless ALLOW_RUBY_VERSION_CHANGES
+if FORBID_RUBY_VERSION_CHANGES
   name_only_array.each do |fil|
     base = File.basename(fil)
     if base == '.ruby-version' || base == '.rbenv-version'
