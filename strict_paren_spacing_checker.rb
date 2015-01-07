@@ -9,8 +9,8 @@ class StrictParenSpacingChecker
   SPACE_CLOSE_SQUARE = /[ \t]+\]/
 
   def self.necessary?
-    undefined = `git config hooks.requirestrictparenspacing`.strip.empty?
-    undefined || (`git config hooks.requirestrictparenspacing`.strip == 'true')
+    val = `git config hooks.requirestrictparenspacing`.strip
+    val.empty? || (val == 'true')
   end
 
   def check(dir, file, changed_code_for_file)
