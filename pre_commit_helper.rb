@@ -14,7 +14,7 @@ class PreCommitHelper
   end
 
   def self.directory_excluded_from_checks?(directory)
-    /assets\// =~ directory && /\/vendor/ =~ directory
+    !!(/assets\// =~ directory && /\/vendor/ =~ directory)
   end
 
 end
