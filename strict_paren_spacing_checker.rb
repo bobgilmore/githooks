@@ -20,26 +20,14 @@ class StrictParenSpacingChecker
 
   def check(dir, file, changed_code_for_file)
     messages = [ ]
-    deactivation_message = PreCommitHelper::deactivation_message("allow", "requirestrictparenspacing", false)
-    
+
     if !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(file)) && !PreCommitHelper::directory_excluded_from_checks?(dir)
-      if changed_code_for_file.match(OPEN_SMOOTH_SPACE_REGEXP)
-        messages << warning_message(file, OPEN_SMOOTH_SPACE)
-        messages << deactivation_message
-      end
-      if changed_code_for_file.match(SPACE_CLOSE_SMOOTH_REGEXP)
-        messages << warning_message(file, SPACE_CLOSE_SMOOTH)
-        messages << deactivation_message
-      end
-      if changed_code_for_file.match(OPEN_SQUARE_SPACE_REGEXP)
-        messages << warning_message(file, OPEN_SQUARE_SPACE)
-        messages << deactivation_message
-      end
-      if changed_code_for_file.match(SPACE_CLOSE_SQUARE_REGEXP)
-        messages << warning_message(file, SPACE_CLOSE_SQUARE)
-        messages << deactivation_message
-      end
+      messages << warning_message(file, OPEN_SMOOTH_SPACE)  if changed_code_for_file.match(OPEN_SMOOTH_SPACE_REGEXP)
+      messages << warning_message(file, SPACE_CLOSE_SMOOTH) if changed_code_for_file.match(SPACE_CLOSE_SMOOTH_REGEXP)
+      messages << warning_message(file, OPEN_SQUARE_SPACE)  if changed_code_for_file.match(OPEN_SQUARE_SPACE_REGEXP)
+      messages << warning_message(file, SPACE_CLOSE_SQUARE) if changed_code_for_file.match(SPACE_CLOSE_SQUARE_REGEXP)
     end
+    messages << PreCommitHelper::deactivation_message("allow", "requirestrictparenspacing", false) unless messages.empty?
     messages
   end
 
