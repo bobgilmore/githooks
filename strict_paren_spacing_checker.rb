@@ -34,7 +34,7 @@ class StrictParenSpacingChecker
   end
 
   def self.preference_for_project?
-    val = `git config hooks.#{HOOK_KEY}`.strip
+    val = PreCommitHelper::git_config_val_for_hook(HOOK_KEY)
     val.empty? || (val == 'true')
   end
 

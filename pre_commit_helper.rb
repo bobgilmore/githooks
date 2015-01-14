@@ -17,4 +17,8 @@ class PreCommitHelper
     !!(/assets\// =~ directory && /\/vendor/ =~ directory)
   end
 
+  def self.git_config_val_for_hook(hook_name)
+    `git config hooks.#{hook_name}`.strip
+  end
+
 end
