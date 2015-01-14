@@ -1,8 +1,4 @@
-# Check that we don't use alerts inappropriately
-
 class AlertChecker
-  require './pre_commit_helper.rb'
-
   attr_reader :messages
 
   def self.use_for_project?

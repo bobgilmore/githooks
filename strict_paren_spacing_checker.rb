@@ -1,8 +1,4 @@
-# Check that we don't use spaces after opening braces or before closing braces.  This is required in some of my projects.
-
 class StrictParenSpacingChecker
-  require './pre_commit_helper.rb'
-
   attr_reader :messages
 
   def self.use_for_project?
@@ -25,7 +21,7 @@ class StrictParenSpacingChecker
   end
 
   def examine_code
-    mess = [ ]
+    mess = []
     if !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(@file)) && !PreCommitHelper.directory_excluded_from_checks?(@dir)
       mess << warning_message(OPEN_SMOOTH_SPACE)  if @changed_code.match(OPEN_SMOOTH_SPACE_REGEXP)
       mess << warning_message(SPACE_CLOSE_SMOOTH) if @changed_code.match(SPACE_CLOSE_SMOOTH_REGEXP)
