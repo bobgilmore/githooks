@@ -12,6 +12,7 @@
 
 load "#{File.dirname(__FILE__)}/pre_commit_helper.rb"
 load "#{File.dirname(__FILE__)}/strict_paren_spacing_checker.rb"
+load "#{File.dirname(__FILE__)}/alert_checker.rb"
 
 include PreCommitHelper
 
@@ -71,9 +72,6 @@ FORBID_RUBY_VERSION_CHANGES = ALLOW_RUBY_VERSION_CHANGES_CONFIG.empty? || (ALLOW
 CHECK_RUBY_CONFIG = `git config hooks.checkrubysyntax`.strip
 CHECK_RUBY_SYNTAX = CHECK_RUBY_CONFIG.empty? || (CHECK_RUBY_CONFIG == 'true')
 
-FLASH = /flash\s*\[\s*:alert\s*\]/
-ALERT = /alert/
-
 ############# END OF CONFIGURATION
 
 # Check for "forbidden" and "warning" strings
@@ -129,13 +127,16 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
 
     # Scan for calls to "alert" that aren't flashes, in files that *aren't* in assets/**/vendor
-    unless PreCommitHelper::directory_excluded_from_checks?(dir)
-      changed_lines_for_file.each do |changed_line|
-        if changed_line.match(ALERT) && !changed_line.match(FLASH)
-          puts %{Warning: git pre-commit hook is suspicious of committing lines with "alert" to #{file}\n--------------}
-          error_found = true
-          break
-        end
+    if AlertChecker::use_for_project?
+      checker_error_found = false
+      checker = AlertChecker.new(dir, file, changed_code_for_file)
+      if checker.errors?
+        checker_error_found = true
+        checker.messages.each { |e| puts(e) }
+      end
+      if checker_error_found
+        error_found = true
+        puts(AlertChecker::deactivation_message) if AlertChecker.respond_to?(:deactivation_message)
       end
     end
 
@@ -148,7 +149,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
       end
       if checker_error_found
         error_found = true
-        puts(StrictParenSpacingChecker::deactivation_message)
+        puts(StrictParenSpacingChecker::deactivation_message) if StrictParenSpacingChecker.respond_to?(:deactivation_message)
       end
     end
   end
