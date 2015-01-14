@@ -8,7 +8,7 @@ class StrictParenSpacingChecker
   end
 
   def self.deactivation_message
-    PreCommitHelper::deactivation_message("allow", "requirestrictparenspacing", false)
+    PreCommitHelper::deactivation_message("allow", HOOK_KEY, false)
   end
 
   def initialize(dir, file, changed_code)
@@ -34,7 +34,7 @@ class StrictParenSpacingChecker
   end
 
   def self.preference_for_project?
-    val = `git config hooks.requirestrictparenspacing`.strip
+    val = `git config hooks.#{HOOK_KEY}`.strip
     val.empty? || (val == 'true')
   end
 
@@ -43,6 +43,8 @@ class StrictParenSpacingChecker
   end
 
   private
+
+  HOOK_KEY = "requirestrictparenspacing"
 
   SHELL_SCRIPT_EXTENSIONS = [ '.sh', '.bash', '' ]
 
