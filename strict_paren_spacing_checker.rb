@@ -7,25 +7,29 @@ class StrictParenSpacingChecker
     preference_for_project?
   end
 
+  def self.deactivation_message
+    PreCommitHelper::deactivation_message("allow", "requirestrictparenspacing", false)
+  end
+
   def initialize(dir, file, changed_code)
     @dir = dir
     @file = file
-    @messages = examine_code(changed_code)
+    @changed_code = changed_code
+    @messages = examine_code
   end
 
   def errors?
     !@messages.empty?
   end
 
-  def examine_code(changed_code)
+  def examine_code
     mess = [ ]
     if !SHELL_SCRIPT_EXTENSIONS.include?(File.extname(@file)) && !PreCommitHelper::directory_excluded_from_checks?(@dir)
-      mess << warning_message(@file, OPEN_SMOOTH_SPACE)  if changed_code.match(OPEN_SMOOTH_SPACE_REGEXP)
-      mess << warning_message(@file, SPACE_CLOSE_SMOOTH) if changed_code.match(SPACE_CLOSE_SMOOTH_REGEXP)
-      mess << warning_message(@file, OPEN_SQUARE_SPACE)  if changed_code.match(OPEN_SQUARE_SPACE_REGEXP)
-      mess << warning_message(@file, SPACE_CLOSE_SQUARE) if changed_code.match(SPACE_CLOSE_SQUARE_REGEXP)
+      mess << warning_message(OPEN_SMOOTH_SPACE)  if @changed_code.match(OPEN_SMOOTH_SPACE_REGEXP)
+      mess << warning_message(SPACE_CLOSE_SMOOTH) if @changed_code.match(SPACE_CLOSE_SMOOTH_REGEXP)
+      mess << warning_message(OPEN_SQUARE_SPACE)  if @changed_code.match(OPEN_SQUARE_SPACE_REGEXP)
+      mess << warning_message(SPACE_CLOSE_SQUARE) if @changed_code.match(SPACE_CLOSE_SQUARE_REGEXP)
     end
-    mess << PreCommitHelper::deactivation_message("allow", "requirestrictparenspacing", false) unless mess.empty?
     mess
   end
 
@@ -34,8 +38,8 @@ class StrictParenSpacingChecker
     val.empty? || (val == 'true')
   end
 
-  def warning_message(file, bad_expression)
-    %{Warning: git pre-commit hook is suspicious of committing lines with "#{bad_expression}" to #{file}\nThis may be OK, or not, depending on your project requirements.}
+  def warning_message(bad_expression)
+    %{Warning: git pre-commit hook is suspicious of committing lines with "#{bad_expression}" to #{@file}\nThis may be OK, or not, depending on your project requirements.}
   end
 
   private

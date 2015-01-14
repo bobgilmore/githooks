@@ -138,10 +138,15 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
 
     if StrictParenSpacingChecker::use_for_project?
+      checker_error_found = false
       checker = StrictParenSpacingChecker.new(dir, file, changed_code_for_file)
       if checker.errors?
-        error_found = true
+        checker_error_found = true
         checker.messages.each { |e| puts(e) }
+      end
+      if checker_error_found
+        error_found = true
+        puts(StrictParenSpacingChecker::deactivation_message)
       end
     end
   end
