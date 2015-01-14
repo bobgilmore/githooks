@@ -13,6 +13,8 @@
 load "#{File.dirname(__FILE__)}/pre_commit_helper.rb"
 load "#{File.dirname(__FILE__)}/strict_paren_spacing_checker.rb"
 
+include PreCommitHelper
+
 ############# CONFIGURATION
 
 # The two sections of regular expressions below ("forbidden" and "warning")
