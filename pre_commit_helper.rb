@@ -21,4 +21,21 @@ module PreCommitHelper
     `git config hooks.#{hook_name}`.strip
   end
 
+  def self.output_error_messages(checker)            
+    checker.messages.each { |e| puts(e) }
+  end
+
+  def self.run_checker(the_class, dir, file, changed_code_for_file)
+    ret = false
+    if the_class.method(:use_for_project?).call
+      checker = the_class.new(dir, file, changed_code_for_file)
+      if checker.errors?
+        ret = true
+        PreCommitHelper::output_error_messages(checker)
+        puts(the_class.method(:deactivation_message).call) if the_class.respond_to?(:deactivation_message)
+      end
+    end
+    ret
+  end
+
 end
