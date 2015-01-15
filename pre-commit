@@ -129,15 +129,6 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     PreCommitHelper::run_checker(AlertChecker, dir, file, changed_code_for_file)
     PreCommitHelper::run_checker(StrictParenSpacingChecker, dir, file, changed_code_for_file )
 
-    # )
-#    if StrictParenSpacingChecker::use_for_project?
-#      checker = StrictParenSpacingChecker.new(dir, file, changed_code_for_file)
-#      if checker.errors?
-#        error_found = true
-#        PreCommitHelper::output_error_messages(checker)
-#        puts(StrictParenSpacingChecker::deactivation_message) if Str#ictParenSpacingChecker.respond_to?(:deactivation_message)
-#      end
-#    end
   end
 end
 
