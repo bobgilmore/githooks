@@ -25,15 +25,12 @@ module PreCommitHelper
     checker.messages.each { |e| puts(e) }
   end
 
-  def self.run_checker(the_class, dir, file, changed_code_for_file)
-    ret = false
-    if the_class.method(:use_for_project?).call
-      checker = the_class.new(dir, file, changed_code_for_file)
-      if checker.errors?
-        ret = true
-        PreCommitHelper::output_error_messages(checker)
-        puts(the_class.method(:deactivation_message).call) if the_class.respond_to?(:deactivation_message)
-      end
+  def self.run_checker(error_found, checker)
+    ret = error_found
+    if checker.errors?
+      ret = true
+      PreCommitHelper::output_error_messages(checker)
+      puts(checker.class.method(:deactivation_message).call) if checker.class.respond_to?(:deactivation_message)
     end
     ret
   end
