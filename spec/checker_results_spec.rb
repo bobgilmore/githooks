@@ -25,8 +25,8 @@ RSpec.describe CheckerResults do
     
     context "with a checker" do
       before do
-        checker.record_checker(checker_1)
-        checker.record_checker(checker_2)
+        checker.record(checker_1)
+        checker.record(checker_2)
       end
 
       it "returns checkers when checkers were added" do
@@ -45,7 +45,7 @@ RSpec.describe CheckerResults do
     context "with an erroring checker" do
       before do
         allow(checker_1).to receive(:errors?).and_return(true)
-        checker.record_checker(checker_1)
+        checker.record(checker_1)
       end
 
       it "returns true" do
@@ -56,7 +56,7 @@ RSpec.describe CheckerResults do
     context "with a non-erroring checker" do
       before do
         allow(checker_1).to receive(:errors?).and_return(false)
-        checker.record_checker(checker_1)
+        checker.record(checker_1)
       end
 
       it "should be falsey" do 
@@ -68,8 +68,8 @@ RSpec.describe CheckerResults do
       before do
         allow(checker_1).to receive(:errors?).and_return(false)
         allow(checker_2).to receive(:errors?).and_return(false)
-        checker.record_checker(checker_1)
-        checker.record_checker(checker_2)
+        checker.record(checker_1)
+        checker.record(checker_2)
       end
 
       it "should be falsey" do
@@ -81,8 +81,8 @@ RSpec.describe CheckerResults do
       before do
         allow(checker_1).to receive(:errors?).and_return(false)
         allow(checker_2).to receive(:errors?).and_return(true)
-        checker.record_checker(checker_1)
-        checker.record_checker(checker_2)
+        checker.record(checker_1)
+        checker.record(checker_2)
       end
 
       it "is truthy" do
@@ -98,7 +98,7 @@ RSpec.describe CheckerResults do
         expect(checker_1).to receive(:errors?)
         expect(checker_1).to_not receive(:messages)
         expect(checker_1_class).to_not receive(:deactivation_message)
-        checker.record_checker(checker_1)
+        checker.record(checker_1)
       end
 
       it "should work" do
@@ -114,7 +114,7 @@ RSpec.describe CheckerResults do
         expect(checker_1).to receive(:errors?)
         expect(checker_1).to receive(:messages)
         expect(checker_1_class).to receive(:deactivation_message)
-        checker.record_checker(checker_1)
+        checker.record(checker_1)
       end
 
       it "should return the messages and the deactivation message" do
@@ -131,7 +131,7 @@ RSpec.describe CheckerResults do
         expect(checker_1).to receive(:errors?)
         expect(checker_1).to receive(:messages)
         expect(checker_1_class).to_not receive(:deactivation_message)
-        checker.record_checker(checker_1)
+        checker.record(checker_1)
       end
 
       it "should include the error output" do

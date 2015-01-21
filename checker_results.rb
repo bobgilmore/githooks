@@ -4,7 +4,7 @@ class CheckerResults
     @checkers = []
   end
   
-  def record_checker(checker)
+  def record(checker)
     @checkers << checker
   end
 
