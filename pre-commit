@@ -11,6 +11,7 @@
 # Bob Gilmore (dev@bobgilmore.name)
 
 load "#{File.dirname(__FILE__)}/pre_commit_helper.rb"
+load "#{File.dirname(__FILE__)}/checker_results.rb"
 load "#{File.dirname(__FILE__)}/strict_paren_spacing_checker.rb"
 load "#{File.dirname(__FILE__)}/alert_checker.rb"
 
@@ -80,6 +81,7 @@ CHECK_RUBY_SYNTAX = CHECK_RUBY_CONFIG.empty? || (CHECK_RUBY_CONFIG == 'true')
 # I want to report on *all* problems that exist in the commit before aborting,
 # so that anyone calling --no-verify has been informed of all problems first.
 error_found = false
+checker_results = CheckerResults.new
 
 full_diff = `git diff --cached --`.encode("UTF-8")
 
@@ -127,11 +129,11 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     end
 
     if AlertChecker.use_for_project?
-      error_found = PreCommitHelper::run_checker(error_found, AlertChecker.new(dir, file, changed_code_for_file))
+      checker_results.record(AlertChecker.new(dir, file, changed_code_for_file))
     end
 
     if StrictParenSpacingChecker.use_for_project?
-      error_found = PreCommitHelper::run_checker(error_found, StrictParenSpacingChecker.new(dir, file, changed_code_for_file))
+      checker_results.record(StrictParenSpacingChecker.new(dir, file, changed_code_for_file))
     end
 
   end
@@ -170,6 +172,10 @@ if FORBID_RUBY_VERSION_CHANGES
   end
 end
 
+if checker_results.errors?
+  error_found = true
+  puts(checker_results)
+end
 # Finally, report errors
 if error_found
   puts "To commit anyway, use --no-verify"
