@@ -1,118 +1,108 @@
 load "checker_results.rb"
+require "pry"
 
 RSpec.describe CheckerResults do
 
- # let(:checker_1) { double }
- # let(:checker_1_class) { double }
- # let(:checker_2) { double }
- # let(:checker_2_class) { double }
+  let(:checker) { CheckerResults.new }
+  let(:checker_1) { double }
+  let(:checker_1_class) { double }
+  let(:checker_2) { double }
+  let(:checker_2_class) { double }
   
- # before do
- #   allow(checker_1).to receive(:class).and_return(checker_1_class)
- #   allow(checker_1_class).to receive(:deactivation_message).and_return("deactivate 1")
- #   allow(checker_2).to receive(:class).and_return(checker_2_class)
- #   allow(checker_2_class).to receive(:deactivation_message).and_return("deactivate 2")
- # end
-  
+  before do
+    allow(checker_1).to receive(:class).and_return(checker_1_class)
+    allow(checker_1_class).to receive(:deactivation_message).and_return("deactivate 1")
+    allow(checker_2).to receive(:class).and_return(checker_2_class)
+    allow(checker_2_class).to receive(:deactivation_message).and_return("deactivate 2")
+  end
   
   describe "#checkers" do
-
     context "with no checker" do
-      subject { CheckerResults.new }
-
-      its(:checkers) { should eq([]) }
+      it "returns empty when no checkers are added" do
+        expect(checker.checkers).to eq([])
+      end
     end
     
     context "with a checker" do
-      subject { CheckerResults.new }
-      
       before do
-        subject.record_checker(checker_1)
+        checker.record_checker(checker_1)
+        checker.record_checker(checker_2)
       end
 
-      its(:checkers).should equal([checker_1])
-    end
-
-    context "with two checkers" do
-      subject { CheckerResults.new }
-      
-      before do
-        subject.record_checker(checker_1)
-        subject.record_checker(checker_2)
+      it "returns checkers when checkers were added" do
+        expect(checker.checkers).to eq([checker_1, checker_2])
       end
-
-      its(:checkers).should equal([checker_1, checker_2])
     end
   end
 
   describe "#errors?" do
-    context "with no checker" do
-      subject { CheckerResults.new }
-
-      its(:errors).should be_falsey
+    context "with no checker added" do
+      it "returns false" do
+        expect(checker.errors?).to be_falsey
+      end
     end
     
     context "with an erroring checker" do
-      subject { CheckerResults.new }
-      
       before do
         allow(checker_1).to receive(:errors?).and_return(true)
-        subject.record_checker(checker_1)
+        checker.record_checker(checker_1)
       end
 
-      its(:errors?).should be_truthy
+      it "returns true" do
+        expect(checker.errors?).to be_truthy
+      end
     end
 
     context "with a non-erroring checker" do
-
       before do
         allow(checker_1).to receive(:errors?).and_return(false)
-        subject.record_checker(checker_1)
+        checker.record_checker(checker_1)
       end
 
-      its(:errors?).should be_falsey
+      it "should be falsey" do 
+        expect(checker.errors?).to be_falsey
+      end
     end
 
     context "with two checkers, both false" do
       before do
-        subject { CheckerResults.new }
         allow(checker_1).to receive(:errors?).and_return(false)
-        allow(checker_1).to receive(:errors?).and_return(false)
-        subject.record_checker(checker_1)
-        subject.record_checker(checker_2)
+        allow(checker_2).to receive(:errors?).and_return(false)
+        checker.record_checker(checker_1)
+        checker.record_checker(checker_2)
       end
 
-      its(:errors).should be_falsey
+      it "should be falsey" do
+        expect(checker.errors?).to be_falsey
+      end
     end
 
     context "with two checkers, one false and one true" do
       before do
-        subject { CheckerResults.new }
         allow(checker_1).to receive(:errors?).and_return(false)
-        allow(checker_1).to receive(:errors?).and_return(true)
-        subject.record_checker(checker_1)
-        subject.record_checker(checker_2)
+        allow(checker_2).to receive(:errors?).and_return(true)
+        checker.record_checker(checker_1)
+        checker.record_checker(checker_2)
       end
 
-      its(:errors).should be_truthy
+      it "is truthy" do
+        expect(checker.errors?).to be_truthy
+      end
     end
   end
 
-  describe "#puts" do
-
-    context "with a checker which returns errors for this project" do
+  describe "#to_s" do
+    context "with a checker which returns no errors for this project" do
       before do
-        subject { CheckerResults.new }
         allow(checker_1).to receive(:errors?).and_return(false)
-        allow(checker_1).to receive(:checkers).and_return([])
         expect(checker_1).to receive(:errors?)
         expect(checker_1).to_not receive(:messages)
         expect(checker_1_class).to_not receive(:deactivation_message)
-        subject.record_checker(checker_1)
+        checker.record_checker(checker_1)
       end
 
       it "should work" do
-        expect(puts(subject)).to be_nil
+        expect(checker.to_s).to eq ""
       end
     end
 
@@ -124,11 +114,11 @@ RSpec.describe CheckerResults do
         expect(checker_1).to receive(:errors?)
         expect(checker_1).to receive(:messages)
         expect(checker_1_class).to receive(:deactivation_message)
-        subject.record_checker(checker_1)
+        checker.record_checker(checker_1)
       end
 
-      it "should work" do
-        expect(puts(subject)).to be_nil
+      it "should return the messages and the deactivation message" do
+        expect(checker.to_s).to include "a\nb\ndeactivate 1\n"
       end
     end
 
@@ -141,11 +131,15 @@ RSpec.describe CheckerResults do
         expect(checker_1).to receive(:errors?)
         expect(checker_1).to receive(:messages)
         expect(checker_1_class).to_not receive(:deactivation_message)
-        subject.record_checker(checker_1)
+        checker.record_checker(checker_1)
       end
 
-      it "should work" do
-        expect(puts(subject)).to be_nil
+      it "should include the error output" do
+        expect(checker.to_s).to include "a\nb\n"
+      end
+
+      it "should include the error output" do
+        expect(checker.to_s).to_not include "deactivate 1"
       end
     end
   end
