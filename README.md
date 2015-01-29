@@ -1,5 +1,6 @@
 githooks
 ========
+[![Build Status](https://travis-ci.org/bobgilmore/githooks.svg?branch=master)](https://travis-ci.org/bobgilmore/githooks)
 
 My personal githooks, which help me avoid mistakes and adhere to  coding guidelines.
 
