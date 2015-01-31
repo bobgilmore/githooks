@@ -1,4 +1,4 @@
-load "private_key_checker.rb"
+load "pre_commit/checkers/private_key_checker.rb"
 
 RSpec.describe PrivateKeyChecker do
 

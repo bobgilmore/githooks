@@ -1,4 +1,4 @@
-load "user_home_checker.rb"
+load "pre_commit/checkers/user_home_checker.rb"
 
 RSpec.describe UserHomeChecker do
 

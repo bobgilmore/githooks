@@ -1,4 +1,4 @@
-load "checker_results.rb"
+load "pre_commit/checker_results.rb"
 require "pry"
 
 RSpec.describe CheckerResults do

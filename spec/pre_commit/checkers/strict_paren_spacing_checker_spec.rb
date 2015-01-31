@@ -1,4 +1,4 @@
-load "strict_paren_spacing_checker.rb"
+load "pre_commit/checkers/strict_paren_spacing_checker.rb"
 
 RSpec.describe StrictParenSpacingChecker do
 
