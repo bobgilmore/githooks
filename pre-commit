@@ -22,6 +22,11 @@ NON_CHECKED_FILE_EXTENSIONS = [
   '.txt'
 ]
 
+NON_CHECKED_FILE_NAMES = [
+  'Gemfile',
+  'Gemfile.lock'
+]
+
 PROJECT_TYPE = PreCommitHelper::project_type
 
 res = CheckerResults.new
@@ -33,7 +38,7 @@ res = CheckerResults.new
 full_diff = `git diff --cached --`.encode("UTF-8")
 
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
-  unless NON_CHECKED_FILE_EXTENSIONS.include? File.extname(file)
+  unless (NON_CHECKED_FILE_NAMES.include?(file) || NON_CHECKED_FILE_EXTENSIONS.include?(File.extname(file)))
     dir = File.dirname(file)
     
     changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
