@@ -18,8 +18,8 @@ These checks should be completely non-controversial, and are therefore non-confi
     2. Personalized debugging statements
     3. Calls to invoke the debugger, either in Ruby or in JavaScript
 2. Catch other suspicious code, such as the addition of calls to `alert` (very uncommon for me)
-3. ~~Syntax-check all .rb files~~ Temporarily deactivated
-4. Check for probable private key commits.
+3. Check for probable private key commits.
+4. Check for *hard-coded* references to your home directory (both Unix and MacOS standards).
 
 ### Conditional Checks ###
 Conditional checks may be controversial or inappropriate for some projects, and so can be deactivated via `git config`.
@@ -27,13 +27,14 @@ Conditional checks may be controversial or inappropriate for some projects, and 
 They are configured to be as strict as possible, and include instructions for turning them off on a project-wide or machine-wide basis.
 
 1. Check the syntax of Ruby files using ruby -c.
-    * In some circumatances (i.e., old Mac OS X versions), an app may use an old version of git that cannot handle newer syntax, such as the Ruby 1.9 JS hash syntax.  This will result in bogus flags.
+    * In some circumatances (i.e., old Mac OS X versions), an app may use an old version of git that cannot handle newer syntax, such as the Ruby 1.9 "JS" hash syntax.  This will result in bogus flags.
     * Run `git config hooks.checkrubysyntax false` in a project directory to deactivate the check.
 2. Prevent changes to `.ruby-version` (and `.rbenv-version`).  
     * In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.
     * In my opinion, you should leave this alone and simply make a `--no-verify` commit when necessary. (See below.)
     * If you insist on deactivating the check, run `git config hooks.allowrubyversionchange true` in a project directory.
 3. Ensure that there are no spaces after `[` and `(`, or before `]` and `)`.
+    * This is house style for several projects.  Unavoidable for me.
     * Run `git config hooks.requirepedanticparenspacing false` in a project directory to always allow it.
 
 Bypassing the Checks
@@ -44,7 +45,12 @@ There's no way to turn off individual checks (other than the "conditional" ones 
 
 Installation
 ============
-Clone this repository locally into some central location.  Then run its setup script, passing the location of *the repo that you want to add hooks to* as an input argument.
+
+One-Time Configuration
+------------
+
+1. Clone this repository locally into some central location.  
+2. Run its setup script, passing the location of *the repo that you want to add hooks to* as an input argument.
     
     cd (someplace "central." For me, that's usually ~/code)
     git clone git@github.com:bobgilmore/githooks.git
@@ -53,6 +59,8 @@ Clone this repository locally into some central location.  Then run its setup sc
 
 This will create symbolic links in the `.git` directory of the repo that you're adding to, which will point to this githooks repo.  
 
+No Further Configuration Required
+-----------
 It will also write to the git config variable `hooks.symlinksourcerepo`, used by the git hooks in https://github.com/bobgilmore/dotfiles to provide effective instructions for leveraging the original installation of this repo, rather than prompting the user to re-clone.
 
 Updating the Hooks
