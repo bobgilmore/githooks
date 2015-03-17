@@ -49,6 +49,7 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     res.record(UserHomeChecker.new(directory: dir, file: file, changes: changed_code_for_file))
     res.record(AlertChecker.new(directory: dir, file: file, changes: changed_lines_for_file))
     res.record(StrictParenSpacingChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(RspecIsExpectedToChecker.new(directory: dir, file: file, changes: changed_code_for_file))
   end
 end
 
