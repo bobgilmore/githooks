@@ -1,4 +1,4 @@
-class SimpleDeactivatableRejectionChecker
+class SimpleDeactivatableRegexpChecker
   attr_reader :messages
 
   def deactivation_message

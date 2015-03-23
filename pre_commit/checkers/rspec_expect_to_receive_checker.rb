@@ -1,6 +1,6 @@
-load "pre_commit/simple_deactivatable_rejection_checker.rb"
+load "pre_commit/simple_deactivatable_regexp_checker.rb"
 
-class RspecExpectToReceiveChecker < SimpleDeactivatableRejectionChecker
+class RspecExpectToReceiveChecker < SimpleDeactivatableRegexpChecker
 
   def initialize(opts)
     merge_in = {
