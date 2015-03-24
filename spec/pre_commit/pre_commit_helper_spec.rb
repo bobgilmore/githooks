@@ -1,4 +1,5 @@
 load "pre_commit/pre_commit_helper.rb"
+require "spec_helper"
 
 RSpec.describe PreCommitHelper do
   describe ".directory_excluded_from_checks?" do

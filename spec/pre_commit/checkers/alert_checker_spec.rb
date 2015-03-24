@@ -1,4 +1,5 @@
 load "pre_commit/checkers/alert_checker.rb"
+require "spec_helper"
 
 RSpec.describe AlertChecker do
 

@@ -1,4 +1,5 @@
 load "pre_commit/checkers/rspec_expect_to_receive_checker.rb"
+require "spec_helper"
 
 RSpec.describe RspecExpectToReceiveChecker do
 

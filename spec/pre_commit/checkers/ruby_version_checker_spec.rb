@@ -1,4 +1,5 @@
 load "pre_commit/checkers/ruby_version_checker.rb"
+require "spec_helper"
 
 RSpec.describe RubyVersionChecker do
 

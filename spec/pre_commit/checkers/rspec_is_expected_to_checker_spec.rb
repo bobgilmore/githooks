@@ -1,4 +1,5 @@
 load "pre_commit/checkers/rspec_is_expected_to_checker.rb"
+require "spec_helper"
 
 RSpec.describe RspecIsExpectedToChecker do
 

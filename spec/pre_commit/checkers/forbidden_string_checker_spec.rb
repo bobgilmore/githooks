@@ -1,4 +1,5 @@
 load "pre_commit/checkers/forbidden_string_checker.rb"
+require "spec_helper"
 
 RSpec.describe ForbiddenStringChecker do
 
