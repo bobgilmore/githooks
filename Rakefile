@@ -1,6 +1,6 @@
 begin
-  require './spec/spec_helper'
-  require 'rspec/core/rake_task'
+  require "./spec/spec_helper"
+  require "rspec/core/rake_task"
 
   RSpec::Core::RakeTask.new(:spec)
 
