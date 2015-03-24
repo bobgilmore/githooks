@@ -60,12 +60,9 @@ RSpec.describe PreCommitHelper do
 
     context "with a checker which returns errors for this project" do
       before do
-        allow(checker).to receive(:errors?).and_return(true)
-        allow(checker).to receive(:messages).and_return(['a', 'b'])
-        allow(checker).to receive(:deactivation_message).and_return(nil)
-        expect(checker).to receive(:errors?)
-        expect(checker).to receive(:messages)
-        expect(checker_class).to receive(:deactivation_message)
+        expect(checker).to receive(:errors?).and_return(true)
+        expect(checker).to receive(:messages).and_return(['a', 'b'])
+        expect(checker_class).to receive(:deactivation_message).and_return(nil)
       end
 
       context "when passed false" do
@@ -81,20 +78,15 @@ RSpec.describe PreCommitHelper do
       end
     end
 
-    context "with a checker whithout a deactivation message" do
-      before do
-        allow(checker).to receive(:errors?).and_return(true)
-        allow(checker).to receive(:messages).and_return(['a', 'b'])
-        allow(checker).to receive(:deactivation_message).and_return(nil)
-        allow(checker_class).to receive(:respond_to?).with(:deactivation_message).and_return(false)
-        expect(checker).to receive(:errors?)
-        expect(checker).to receive(:messages)
-        expect(checker_class).to_not receive(:deactivation_message)
-        
-      end
+    context "with a checker without a deactivation message" do
 
       context "when passed false" do
         it "should return true" do
+          expect(checker).to receive(:errors?).and_return(true)
+          expect(checker).to receive(:messages).and_return(['a', 'b'])
+          expect(checker_class).to receive(:respond_to?).with(:deactivation_message).and_return(false)
+          expect(checker_class).to_not receive(:deactivation_message)
+
           expect(PreCommitHelper.run_checker(false, checker)).to be_truthy
         end
       end

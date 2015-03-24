@@ -4,35 +4,27 @@ RSpec.describe ForbiddenStringChecker do
 
   context "code that's OK" do
     subject { ForbiddenStringChecker.new(file: "fizzbuzz.rb", changes: "Hello") }
-    
+
     describe "#errors?" do
-      it "should have no errors" do
-        expect(subject.errors?).to be_falsey
-      end
+      its(:errors?) { should be_falsey }
     end
 
     describe "#messages" do
-      it "should have no messages" do
-        expect(subject.messages).to be_empty
-      end
+      its(:messages) { should be_empty }
     end
-  
+
   end
 
   shared_examples_for "a checker that detects an error" do
     describe "#errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
-    
+
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
-  
+
   context "code with tmp_debugging markers" do
     subject { ForbiddenStringChecker.new(file: "fizzbuzz.rb", changes: "Hello TMP_DEBUG there") }
     it_should_behave_like "a checker that detects an error"
@@ -94,22 +86,18 @@ RSpec.describe ForbiddenStringChecker do
   end
 
   context "in a node project" do
-    
+
     context "code with nothing wrong" do
       subject { ForbiddenStringChecker.new(file: "fizzbuzz.rb",
                                            changes: "Hello",
                                            project_type: :node) }
-      
+
       describe "#errors?" do
-        it "should have no errors" do
-          expect(subject.errors?).to be_falsey
-        end
+        its(:errors?) { should be_falsey }
       end
-      
+
       describe "#messages" do
-        it "should have no messages" do
-          expect(subject.messages).to be_empty
-        end
+        its(:messages) { should be_empty }
       end
     end
 

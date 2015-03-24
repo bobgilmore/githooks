@@ -9,15 +9,11 @@ RSpec.describe StrictParenSpacingChecker do
                                             changes: "Hello") }
 
     describe "#errors?" do
-      it "should have no errors" do
-        expect(subject.errors?).to be_falsey
-      end
+     its(:errors?) { should be_falsey }
     end
 
     describe "#messages" do
-      it "should have no messages" do
-        expect(subject.messages).to be_empty
-      end
+      its(:messages) { should be_empty }
     end
   end
 
@@ -28,15 +24,11 @@ RSpec.describe StrictParenSpacingChecker do
                                             changes: " (Hello) ") }
 
     describe "errors?" do
-      it "should have no errors" do
-        expect(subject.errors?).to be_falsey
-      end
+      its(:errors?) { should be_falsey }
     end
 
     describe "#messages" do
-      it "should have no messages" do
-        expect(subject.messages).to be_empty
-      end
+      its(:messages) { should be_empty }
     end
   end
 
@@ -47,15 +39,11 @@ RSpec.describe StrictParenSpacingChecker do
                                             changes: "Hi ( there") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
 
@@ -66,15 +54,11 @@ RSpec.describe StrictParenSpacingChecker do
                                             changes: "Hi (there )") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
 
@@ -85,15 +69,11 @@ RSpec.describe StrictParenSpacingChecker do
                                             changes: "Hi [ there") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
 
@@ -104,15 +84,11 @@ RSpec.describe StrictParenSpacingChecker do
                                             changes: "Hi there ]") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
 
@@ -120,15 +96,11 @@ RSpec.describe StrictParenSpacingChecker do
     subject { StrictParenSpacingChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "Hi ( there\n and here's ( another") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
 
@@ -136,15 +108,11 @@ RSpec.describe StrictParenSpacingChecker do
     subject { StrictParenSpacingChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "Hi ( there\n and here's ]another") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have two messages" do
-        expect(subject.messages.count).to eq(2)
-      end
+      its("messages.count") { should eq(2) }
     end
   end
 

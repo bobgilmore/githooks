@@ -9,15 +9,11 @@ RSpec.describe RspecIsExpectedToChecker do
                                             changes: "Hello") }
 
     describe "#errors?" do
-      it "should have no errors" do
-        expect(subject.errors?).to be_falsey
-      end
+      its(:errors?) { should be_falsey }
     end
 
     describe "#messages" do
-      it "should have no messages" do
-        expect(subject.messages).to be_empty
-      end
+      its(:messages) { should be_empty }
     end
   end
 
@@ -28,15 +24,11 @@ RSpec.describe RspecIsExpectedToChecker do
                                             changes: "foo.should eq 3") }
 
     describe "errors?" do
-      it "should have no errors" do
-        expect(subject.errors?).to be_falsey
-      end
+      its(:errors?) { should be_falsey }
     end
 
     describe "#messages" do
-      it "should have no messages" do
-        expect(subject.messages).to be_empty
-      end
+      its(:messages) { should be_empty }
     end
   end
 
@@ -47,15 +39,11 @@ RSpec.describe RspecIsExpectedToChecker do
                                             changes: "it { is_expected.to eq 3 }") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
 
@@ -66,15 +54,11 @@ RSpec.describe RspecIsExpectedToChecker do
                                             changes: "it { is_expected.to_not eq 3 }") }
 
     describe "errors?" do
-      it "should have an error" do
-        expect(subject.errors?).to be_truthy
-      end
+      its(:errors?) { should be_truthy }
     end
 
     describe "#messages" do
-      it "should have one message" do
-        expect(subject.messages.count).to eq(1)
-      end
+      its("messages.count") { should eq(1) }
     end
   end
 
