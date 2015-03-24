@@ -10,8 +10,11 @@
 #
 # Bob Gilmore (dev@bobgilmore.name)
 
-load "#{File.dirname(__FILE__)}/pre_commit/pre_commit_helper.rb"
-load "#{File.dirname(__FILE__)}/pre_commit/checker_results.rb"
+$:.unshift File.dirname(__FILE__)
+$:.unshift "#{File.dirname(__FILE__)}/pre_commit"
+
+require "pre_commit_helper.rb"
+require "checker_results.rb"
 Dir[File.dirname(__FILE__) + "/pre_commit/checkers/*_checker.rb"].each { |f| load f }
 
 include PreCommitHelper

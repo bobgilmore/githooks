@@ -1,4 +1,4 @@
-load "pre_commit/simple_deactivatable_regexp_checker.rb"
+require "simple_deactivatable_regexp_checker"
 
 class RspecIsExpectedToChecker < SimpleDeactivatableRegexpChecker
 

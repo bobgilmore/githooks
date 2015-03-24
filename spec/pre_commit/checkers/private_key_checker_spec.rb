@@ -1,5 +1,7 @@
 load "pre_commit/checkers/private_key_checker.rb"
 
+require 'spec_helper'
+
 RSpec.describe PrivateKeyChecker do
 
   context "code with private keys" do
