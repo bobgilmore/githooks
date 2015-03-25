@@ -23,7 +23,7 @@ class RubyVersionChecker
     @files.each do |file|
       base = File.basename(file)
       if base == '.ruby-version' || base == '.rbenv-version'
-        mess << %{Warning: git pre-commit hook found attempt to edit #{base}.\nThis may be OK, or not, depending on your project requirements.}
+        mess << %{Edit to #{base} - you probably didn't mean to do that.}
       end
     end
     mess

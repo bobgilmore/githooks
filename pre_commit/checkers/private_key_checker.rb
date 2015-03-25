@@ -16,7 +16,7 @@ class PrivateKeyChecker
     mess = []
     PRIVATE_KEY_INDICATORS.each do |re|
       if @changed_code.match(re)
-        mess << %{Error: git pre-commit hook detected a probable private key commit: "#{$1 || $&}" to #{@file}}
+        mess << %{Probable private key commit "#{$1 || $&}" to #{@file}}
       end
     end
     mess

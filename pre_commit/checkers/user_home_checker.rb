@@ -22,7 +22,7 @@ class UserHomeChecker
     mess = []
     @user_home.each do |re|
       if @changed_code.match(re)
-        mess << %{Error: git pre-commit hook forbids committing what looks like a hard-coded home dir: "#{$1 || $&}" to #{@file}}
+        mess << %{An apparent hard-coded home dir: "#{$1 || $&}" in #{@file}}
       end
     end
     mess

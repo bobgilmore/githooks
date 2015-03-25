@@ -37,7 +37,7 @@ class StrictParenSpacingChecker
   end
 
   def warning_message(bad_expression)
-    %{Warning: git pre-commit hook is suspicious of committing lines with "#{bad_expression}" to #{@file}\nThis may be OK, or not, depending on your project requirements.}
+    %{Lines with "#{bad_expression}" in #{@file}.}
   end
 
   HOOK_KEY = "require-strict-paren-spacing"

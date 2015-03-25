@@ -40,7 +40,7 @@ class SyntaxRubyChecker
   end
 
   def warning_message(fullfile)
-    %{Error: git pre-commit hook found a syntax error in #{fullfile}.\nIf you find that this check is flagging valid code too often, you may be using an old system git to perform the syntax check.}
+    %{Syntax error in #{fullfile}.\nIf this flags valid code, you may be using an old system git.\n(Using #{`git --version`})}
   end
 
   HOOK_KEY = "check-ruby-syntax"

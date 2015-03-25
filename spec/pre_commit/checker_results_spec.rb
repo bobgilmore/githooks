@@ -9,21 +9,21 @@ RSpec.describe CheckerResults do
   let(:checker_1_class) { double }
   let(:checker_2) { double }
   let(:checker_2_class) { double }
-  
+
   before do
     allow(checker_1).to receive(:class).and_return(checker_1_class)
     allow(checker_1_class).to receive(:deactivation_message).and_return("deactivate 1")
     allow(checker_2).to receive(:class).and_return(checker_2_class)
     allow(checker_2_class).to receive(:deactivation_message).and_return("deactivate 2")
   end
-  
+
   describe "#checkers" do
     context "with no checker" do
       it "returns empty when no checkers are added" do
         expect(checker.checkers).to eq([])
       end
     end
-    
+
     context "with a checker" do
       before do
         checker.record(checker_1)
@@ -42,7 +42,7 @@ RSpec.describe CheckerResults do
         expect(checker.errors?).to be_falsey
       end
     end
-    
+
     context "with an erroring checker" do
       before do
         allow(checker_1).to receive(:errors?).and_return(true)
@@ -118,12 +118,20 @@ RSpec.describe CheckerResults do
         checker.record(checker_1)
       end
 
-      it "should return the messages and the deactivation message" do
-        expect(checker.to_s).to include "a\nb\ndeactivate 1\n"
+      it "includes mention of the git hook" do
+        expect(checker.to_s).to include "git pre-commit hook"
+      end
+
+      it "includes the error output" do
+        expect(checker.to_s).to include "a\nb\n"
+      end
+
+      it "includes the deactivation message" do
+        expect(checker.to_s).to include "deactivate 1"
       end
     end
 
-    context "with a checker whithout a deactivation message" do
+    context "with a checker without a deactivation message" do
       before do
         allow(checker_1).to receive(:errors?).and_return(true)
         allow(checker_1).to receive(:messages).and_return(['a', 'b'])
@@ -135,11 +143,15 @@ RSpec.describe CheckerResults do
         checker.record(checker_1)
       end
 
-      it "should include the error output" do
+      it "includes mention of the git hook" do
+        expect(checker.to_s).to include "git pre-commit hook"
+      end
+
+      it "includes the error output" do
         expect(checker.to_s).to include "a\nb\n"
       end
 
-      it "should include the error output" do
+      it "doesn't include the deactivation message" do
         expect(checker.to_s).to_not include "deactivate 1"
       end
     end

@@ -25,7 +25,7 @@ class SimpleDeactivatableRegexpChecker
     return [] unless use_for_project?
     mess = []
     if !PreCommitHelper.directory_excluded_from_checks?(@dir)
-      mess << warning_message if @changed_code.match(@regexp)
+      mess << @warning_message if @changed_code.match(@regexp)
     end
     mess
   end
@@ -35,10 +35,6 @@ class SimpleDeactivatableRegexpChecker
   def use_for_project?
     val = PreCommitHelper.git_config_val_for_hook(@hook_key)
     val.empty? || (val == 'true') || @pref_on
-  end
-
-  def warning_message
-    %{#{@warning_message} in #{@file}}
   end
 
 end
