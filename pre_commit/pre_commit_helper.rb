@@ -21,7 +21,7 @@ module PreCommitHelper
     `git config hooks.#{hook_name}`.strip
   end
 
-  def self.output_error_messages(checker)            
+  def self.output_error_messages(checker)
     checker.messages.each { |e| puts(e) }
   end
 

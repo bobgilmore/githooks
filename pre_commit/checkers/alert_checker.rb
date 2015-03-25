@@ -25,7 +25,7 @@ class AlertChecker
   end
 
   private
-  
+
   def warning_message
     %{Warning: git pre-commit hook is suspicious of committing lines with "alert" to #{@file}\n--------------}
   end
