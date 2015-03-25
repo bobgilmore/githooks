@@ -32,10 +32,10 @@ They are configured to be as strict as possible, and include instructions for tu
 2. Prevent changes to `.ruby-version` (and `.rbenv-version`).
     * In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.
     * In my opinion, you should leave this alone and simply make a `--no-verify` commit when necessary. (See below.)
-    * If you insist on deactivating the check, run `git config hooks.allowrubyversionchange true` in a project directory.
+    * If you insist on deactivating the check, run `git config hooks.allow-ruby-version-change true` in a project directory.
 3. Ensure that there are no spaces after `[` and `(`, or before `]` and `)`.
-    * This is house style for several projects.  Unavoidable for me.
-    * Run `git config hooks.requirepedanticparenspacing false` in a project directory to always allow it.
+    * This is house style for several projects.
+    * Run `git config hooks.require-strict-paren-spacing false` in a project directory to always allow it.
 
 Bypassing the Checks
 --------------------
@@ -63,21 +63,21 @@ No Further Configuration Required
 -----------
 It will also write to the git config variable `hooks.symlinksourcerepo`, used by the git hooks in https://github.com/bobgilmore/dotfiles to provide effective instructions for leveraging the original installation of this repo, rather than prompting the user to re-clone.
 
-Updating the Hooks
+Updating the Hooks (Obsolete, Requires Update)
 ==================
 Since the githook files that you'll be creating in your individual repos are all symbolic links into your (presumably) one local copy of this repo, updating or changing your local copy of this repo will affect *all repos that you set this up for, all at once.*  Note; this goes both ways:
 
 - If you pull updates from Github to your local copy, all of your repos will instantaneously get the updates.
 - If you edit your local copy to make a change in one of your project, you'll effect *all* of your projects.  Of course, you *could* set up multiple local copies of this repo for different "styles" of project, but read the next section for a better approach.
 
-Advice for Committers
+Advice for Committers (Obsolete, Requires Update)
 ======================
 
 Add Repo-Specific Changes *Conditionally*
 ---------
 Since all of your affected repos have symlinks to one shared set of hooks, don't make project-specific changes to the hook files.  Rather, make the behavior change based on an **optional** git configuration variable, and then set that variable for the projects where it's necessary.
 
-See how I handle `checkrubysyntax` in the `pre-commit` file for an example of how to do this.
+See how I handle `check-ruby-syntax` in the `pre-commit` file for an example of how to do this.
 
 I think that it's best to add a new checkin its "most stringent" setting, so that people can become aware of if and make an informed decision to deactivate it.
 
