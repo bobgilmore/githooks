@@ -40,7 +40,7 @@ class StrictParenSpacingChecker
     %{Warning: git pre-commit hook is suspicious of committing lines with "#{bad_expression}" to #{@file}\nThis may be OK, or not, depending on your project requirements.}
   end
 
-  HOOK_KEY = "requirestrictparenspacing"
+  HOOK_KEY = "require-strict-paren-spacing"
 
   SHELL_SCRIPT_EXTENSIONS = [ '.sh', '.bash', '' ]
 

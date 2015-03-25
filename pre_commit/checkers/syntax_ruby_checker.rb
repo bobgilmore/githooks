@@ -43,5 +43,5 @@ class SyntaxRubyChecker
     %{Error: git pre-commit hook found a syntax error in #{fullfile}.\nIf you find that this check is flagging valid code too often, you may be using an old system git to perform the syntax check.}
   end
 
-  HOOK_KEY = "checkrubysyntax"
+  HOOK_KEY = "check-ruby-syntax"
 end

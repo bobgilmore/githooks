@@ -1,7 +1,7 @@
 class RubyVersionChecker
   attr_reader :messages
 
-  HOOK_KEY = "allowrubyversionchange"
+  HOOK_KEY = "allow-ruby-version-change"
 
   def self.deactivation_message
     PreCommitHelper.deactivation_message("allow", HOOK_KEY, true)
