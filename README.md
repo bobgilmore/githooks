@@ -24,24 +24,27 @@ These checks should be completely non-controversial, and are therefore non-confi
 ### Conditional Checks ###
 Conditional checks may be controversial or inappropriate for some projects, and so can be deactivated via `git config`.
 
-They are configured to be as strict as possible, and include instructions for turning them off on a project-wide or machine-wide basis.
+They are always to be as strict as possible out-of-the-box, and include instructions for turning them off on a project- or user-wide basis.
 
 1. Check the syntax of Ruby files using ruby -c.
-    * In some circumatances (i.e., old Mac OS X versions), an app may use an old version of git that cannot handle newer syntax, such as the Ruby 1.9 "JS" hash syntax.  This will result in bogus flags.
-    * Run `git config hooks.checkrubysyntax false` in a project directory to deactivate the check.
+	* In some circumstances (i.e., old Mac OS X versions), an app may use an old version of git that can't handle newer syntax, such as the Ruby 1.9 "JS" hash syntax.  This will result in bogus flags.
 2. Prevent changes to `.ruby-version` (and `.rbenv-version`).
-    * In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.
-    * In my opinion, you should leave this alone and simply make a `--no-verify` commit when necessary. (See below.)
-    * If you insist on deactivating the check, run `git config hooks.allow-ruby-version-change true` in a project directory.
-3. Ensure that there are no spaces after `[` and `(`, or before `]` and `)`.
-    * This is house style for several projects.
-    * Run `git config hooks.require-strict-paren-spacing false` in a project directory to always allow it.
+	* In my experience, those files are committed *accidentally* (by developers who changed them locally with no intention of committing the changes) far more often then they are committed intentionally.
+	* In my opinion, you should leave this alone and simply make a `--no-verify` commit when necessary. (See below.)
+3. Several "house style" issues for my employer
+	1. Ensure that there are no spaces after `[` and `(`, or before `]` and `)`.
+	2. RSpec-Related:
+		1. Prefer `should` over `is_expected.to`
+		2. Prefer `allow(foo).to receive` and `expect(foo).to have_received` over `expect(foo).to have_received`.
+		3. Prefer `should eq` over `should ==`
 
 Bypassing the Checks
 --------------------
-Call git commit with the `--no-verify flag` to ignore all of these checks.
+Pass the `--no-verify` flag to  `git commit` to ignore all of these checks.
 
-There's no way to turn off individual checks (other than the "conditional" ones mentioned above).  That's why this script goes to pains to display *all* errors, rather than just the first one.  If you want to throw the `--no-verify` flag, you should clean up your code to the point where the **only** errors are the ones you feel safe ignoring, **then** throw the flag.
+There's no way to turn off individual checks (other than the "conditional" ones mentioned above).  That's why this script goes to pains to display *all* errors, rather than just the first one it encounters.  
+
+If you want to throw the `--no-verify` flag, you should clean up your code to the point where the **only** errors are the ones you feel safe ignoring, and **then** throw the flag.
 
 Installation
 ============
@@ -50,25 +53,28 @@ One-Time Configuration
 ------------
 
 1. Clone this repository locally into some central location.  
-2. Run its setup script, passing the location of *the repo that you want to add hooks to* as an input argument.
-    
-    cd (someplace "central." For me, that's usually ~/code)
-    git clone git@github.com:bobgilmore/githooks.git
-    cd (into the newly-created repository directory)
-    ./setup.sh path_to_repo_that_you_want_to_add_hooks_to
+2. Run its setup script, passing the location of *a repo that you want to use the hooks with* as an input argument.
 
+For example...
+
+```sh
+cd (/someplace/central/for/me/thats/usually/~/code)
+git clone git@github.com:bobgilmore/githooks.git
+cd (into/the/newly-created/repository/directory)
+./setup.sh path_to_repo_that_you_want_to_add_hooks_to
+```
 This will create symbolic links in the `.git` directory of the repo that you're adding to, which will point to this githooks repo.  
 
-No Further Configuration Required
+No Further Configuration Required (Obsolete, Requires Update)
 -----------
-It will also write to the git config variable `hooks.symlinksourcerepo`, used by the git hooks in https://github.com/bobgilmore/dotfiles to provide effective instructions for leveraging the original installation of this repo, rather than prompting the user to re-clone.
+Running the setup script once *also* writes its location to the git config variable `hooks.symlinksourcerepo`, used by the git hooks in https://github.com/bobgilmore/dotfiles to provide effective instructions for leveraging the original installation of this repo, rather than prompting the user to re-clone.
 
 Updating the Hooks (Obsolete, Requires Update)
 ==================
 Since the githook files that you'll be creating in your individual repos are all symbolic links into your (presumably) one local copy of this repo, updating or changing your local copy of this repo will affect *all repos that you set this up for, all at once.*  Note; this goes both ways:
 
 - If you pull updates from Github to your local copy, all of your repos will instantaneously get the updates.
-- If you edit your local copy to make a change in one of your project, you'll effect *all* of your projects.  Of course, you *could* set up multiple local copies of this repo for different "styles" of project, but read the next section for a better approach.
+- If you edit your "local" copy to make a change in one of your project, you're really editing the symlink.  This, in turn, effects *all* of your projects.  Of course, you *could* set up multiple local copies of this repo for different "styles" of project, but read the next section for a better approach.
 
 Advice for Committers (Obsolete, Requires Update)
 ======================
@@ -79,7 +85,7 @@ Since all of your affected repos have symlinks to one shared set of hooks, don't
 
 See how I handle `check-ruby-syntax` in the `pre-commit` file for an example of how to do this.
 
-I think that it's best to add a new checkin its "most stringent" setting, so that people can become aware of if and make an informed decision to deactivate it.
+It's best to add a new checkin its "most stringent" setting, so that people can become aware of if and make an informed decision to deactivate it.
 
 Writing Checks to Run (or Ignore) for Some Extensions or Directories
 ---------
