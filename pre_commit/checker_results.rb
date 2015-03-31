@@ -3,7 +3,7 @@ class CheckerResults
   def initialize
     @checkers = []
   end
-  
+
   def record(checker)
     @checkers << checker
   end

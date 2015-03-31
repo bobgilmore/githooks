@@ -4,7 +4,7 @@ require "pry"
 
 RSpec.describe CheckerResults do
 
-  let(:checker) { CheckerResults.new }
+  subject(:checker) { CheckerResults.new }
   let(:checker_1) { double }
   let(:checker_1_class) { double }
   let(:checker_2) { double }

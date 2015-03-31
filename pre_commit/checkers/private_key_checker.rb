@@ -29,5 +29,4 @@ class PrivateKeyChecker
     /ssh-rsa/
   ]
 
-
 end

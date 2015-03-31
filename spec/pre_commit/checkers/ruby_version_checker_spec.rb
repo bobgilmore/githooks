@@ -5,7 +5,7 @@ RSpec.describe RubyVersionChecker do
 
   context "with .ruby-version" do
     subject { RubyVersionChecker.new(files: ["foo/bar.rb", "foo/.ruby-version"], pref_on: true)}
-    
+
     describe "#errors?" do
       it "should have an error" do
         expect(subject.errors?).to be_truthy
@@ -21,7 +21,7 @@ RSpec.describe RubyVersionChecker do
 
   context "with .rbenv-version" do
     subject { RubyVersionChecker.new(files: ["foo/bar.rb", "foo/.rbenv-version"], pref_on: true) }
-    
+
     describe "#errors?" do
       it "should have an error" do
         expect(subject.errors?).to be_truthy
@@ -37,7 +37,7 @@ RSpec.describe RubyVersionChecker do
 
   context "with no version-related files" do
     subject { RubyVersionChecker.new(files: ["foo/bar.rb", "foo/biff.css"], pref_on: true) }
-    
+
     describe "#errors?" do
       it "should have no errors" do
         expect(subject.errors?).to be_falsey

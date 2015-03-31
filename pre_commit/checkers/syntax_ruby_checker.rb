@@ -31,7 +31,7 @@ class SyntaxRubyChecker
     end
     mess
   end
-  
+
   private
 
   def self.use_for_project?

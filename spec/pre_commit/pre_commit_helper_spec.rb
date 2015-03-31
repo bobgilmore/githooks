@@ -36,7 +36,7 @@ RSpec.describe PreCommitHelper do
       allow(checker).to receive(:class).and_return(checker_class)
       allow(checker_class).to receive(:deactivation_message).and_return("This is how we deactivate.")
     end
-    
+
     context "with a checker which doesn't return errors for this project" do
       before do
         allow(checker).to receive(:errors?).and_return(false)
@@ -82,7 +82,7 @@ RSpec.describe PreCommitHelper do
       end
     end
 
-    context "with a checker whithout a deactivation message" do
+    context "with a checker without a deactivation message" do
       before do
         allow(checker).to receive(:errors?).and_return(true)
         allow(checker).to receive(:messages).and_return(['a', 'b'])
@@ -91,7 +91,7 @@ RSpec.describe PreCommitHelper do
         expect(checker).to receive(:errors?)
         expect(checker).to receive(:messages)
         expect(checker_class).to_not receive(:deactivation_message)
-        
+
       end
 
       context "when passed false" do
