@@ -38,9 +38,13 @@ They are always to be as strict as possible out-of-the-box, and include instruct
 		2. Prefer `allow(foo).to receive` and `expect(foo).to have_received` over `expect(foo).to have_received`.
 		3. Prefer `should eq` over `should ==`
 
+pre-push
+----------
+Prevents me from pushing any commits that begin with "foo." ("foo" is my usual commit message for a commit that I intend to rebase into *another* commit before pushing.  This will prevent me from accidentally pushing without rebasing first.) 
+
 Bypassing the Checks
 --------------------
-Pass the `--no-verify` flag to  `git commit` to ignore all of these checks.
+Pass the `--no-verify` flag to  `git commit` or `git push` as appropriate to bypass *all* of the checks.
 
 There's no way to turn off individual checks (other than the "conditional" ones mentioned above).  That's why this script goes to pains to display *all* errors, rather than just the first one it encounters.  
 
