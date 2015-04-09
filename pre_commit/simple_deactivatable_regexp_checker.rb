@@ -1,10 +1,6 @@
 class SimpleDeactivatableRegexpChecker
   attr_reader :messages
 
-  def deactivation_message
-    PreCommitHelper.deactivation_message("allow", @hook_key, false)
-  end
-
   def initialize(opts)
     @dir = opts[:dir]
     @file = opts[:file]

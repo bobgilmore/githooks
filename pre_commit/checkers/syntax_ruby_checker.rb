@@ -2,7 +2,7 @@ class SyntaxRubyChecker
   attr_reader :messages
 
   def self.deactivation_message
-    PreCommitHelper.deactivation_message("deactivate", HOOK_KEY, false)
+    PreCommitHelper.deactivation_message("deactivate", HOOK_KEY)
   end
 
   def initialize(opts)
