@@ -18,7 +18,7 @@ RSpec.describe PreCommitHelper do
 
   describe ".deactivation_message" do
     it "should return a valid disabling message" do
-      expect(PreCommitHelper.deactivation_message("disable", "foo", "bar")).to include("To permanently disable for this repo, run\ngit config hooks.foo bar")
+      expect(PreCommitHelper.deactivation_message("disable", "foo")).to include("To permanently disable for this repo, run\ngit config hooks.foo false")
     end
   end
 

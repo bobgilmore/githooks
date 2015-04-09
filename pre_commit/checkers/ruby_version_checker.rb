@@ -1,10 +1,10 @@
 class RubyVersionChecker
   attr_reader :messages
 
-  HOOK_KEY = "allow-ruby-version-change"
+  HOOK_KEY = "forbid-ruby-version-change"
 
   def self.deactivation_message
-    PreCommitHelper.deactivation_message("allow", HOOK_KEY, true)
+    PreCommitHelper.deactivation_message("allow", HOOK_KEY)
   end
 
   def initialize(opts)
@@ -33,7 +33,7 @@ class RubyVersionChecker
 
   def self.use_for_project?
     val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
-    val.empty? || (val == 'false') || @pref_on
+    val.empty? || (val == 'true') || @pref_on
   end
 
 end
