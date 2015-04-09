@@ -3,7 +3,6 @@ require "spec_helper"
 require "pry"
 
 RSpec.describe CheckerResults do
-
   subject(:checker) { CheckerResults.new }
   let(:checker_1) { double }
   let(:checker_1_class) { double }
@@ -60,7 +59,7 @@ RSpec.describe CheckerResults do
         checker.record(checker_1)
       end
 
-      it "should be falsey" do 
+      it "should be falsey" do
         expect(checker.errors?).to be_falsey
       end
     end
