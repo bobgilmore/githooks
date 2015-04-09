@@ -1,5 +1,7 @@
-load "pre_commit/checkers/rspec_expect_to_receive_checker.rb"
 require "spec_helper"
+require "support/shared_examples.rb"
+
+load "pre_commit/checkers/rspec_expect_to_receive_checker.rb"
 
 RSpec.describe RspecExpectToReceiveChecker do
 
@@ -8,18 +10,7 @@ RSpec.describe RspecExpectToReceiveChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "Hello") }
-
-    describe "#errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
   context "code with an expect to have_received" do
@@ -27,18 +18,7 @@ RSpec.describe RspecExpectToReceiveChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "expect(foo).to have_received") }
-
-    describe "#errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
 
@@ -47,18 +27,7 @@ RSpec.describe RspecExpectToReceiveChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "expect(foo).to receive") }
-
-    describe "errors?" do
-      it "should have an error" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
 
   context "code with a expect to receive" do
@@ -66,18 +35,6 @@ RSpec.describe RspecExpectToReceiveChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "expect(foo).to_not receive") }
-
-    describe "errors?" do
-      it "should have an error" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
-
 end

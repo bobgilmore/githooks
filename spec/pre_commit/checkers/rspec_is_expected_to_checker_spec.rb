@@ -1,5 +1,7 @@
-load "pre_commit/checkers/rspec_is_expected_to_checker.rb"
 require "spec_helper"
+require "support/shared_examples.rb"
+
+load "pre_commit/checkers/rspec_is_expected_to_checker.rb"
 
 RSpec.describe RspecIsExpectedToChecker do
 
@@ -8,18 +10,7 @@ RSpec.describe RspecIsExpectedToChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "Hello") }
-
-    describe "#errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
   context "code with a SHOULD" do
@@ -27,18 +18,7 @@ RSpec.describe RspecIsExpectedToChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "foo.should eq 3") }
-
-    describe "errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
   context "code with an 'is_expected.to'" do
@@ -46,18 +26,7 @@ RSpec.describe RspecIsExpectedToChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "it { is_expected.to eq 3 }") }
-
-    describe "errors?" do
-      it "should have an error" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
 
   context "code with an 'is_expected.to_not'" do
@@ -65,18 +34,6 @@ RSpec.describe RspecIsExpectedToChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "it { is_expected.to_not eq 3 }") }
-
-    describe "errors?" do
-      it "should have an error" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
-
 end

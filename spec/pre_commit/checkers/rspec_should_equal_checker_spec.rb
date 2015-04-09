@@ -1,5 +1,7 @@
-load "pre_commit/checkers/rspec_should_equal_checker.rb"
 require "spec_helper"
+require "support/shared_examples.rb"
+
+load "pre_commit/checkers/rspec_should_equal_checker.rb"
 
 RSpec.describe RspecShouldEqualChecker do
 
@@ -8,18 +10,7 @@ RSpec.describe RspecShouldEqualChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "Hello") }
-
-    describe "#errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
   context "code without any issues" do
@@ -27,18 +18,7 @@ RSpec.describe RspecShouldEqualChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "should eq") }
-
-    describe "#errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
   context "code with a 'should =='" do
@@ -46,18 +26,7 @@ RSpec.describe RspecShouldEqualChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "  foo.should  == 3") }
-
-    describe "errors?" do
-      it "should have an error" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
 
   context "code with a 'should_not =='" do
@@ -65,18 +34,7 @@ RSpec.describe RspecShouldEqualChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "  foo.should_not  == 3") }
-
-    describe "errors?" do
-      it "should have an error" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
 
   context "code with an 'should !='" do
@@ -84,18 +42,6 @@ RSpec.describe RspecShouldEqualChecker do
                                             file: "fizzbuzz.rb",
                                             pref_on: true,
                                             changes: "  foo.should  != 3") }
-
-    describe "errors?" do
-      it "should have an error" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
-
 end

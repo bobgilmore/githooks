@@ -1,54 +1,22 @@
-load "pre_commit/checkers/alert_checker.rb"
 require "spec_helper"
+require "support/shared_examples.rb"
+
+load "pre_commit/checkers/alert_checker.rb"
 
 RSpec.describe AlertChecker do
 
   context "code with no alert" do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: ["Hello"]) }
-
-    describe "#errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
   context "code with an alert" do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: ["x=3", "alert('error')"]) }
-
-    describe "errors?" do
-      it "should have an errors" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
 
   context "code with a flash[:alert]" do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: ["x=3", "flash[:alert] = 'Nooooo!'"]) }
-
-    describe "errors?" do
-      it "should not have an error" do
-        expect(checker.errors?).to be_falsy
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
-
 end

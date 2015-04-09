@@ -1,54 +1,22 @@
-load "pre_commit/checkers/private_key_checker.rb"
 require "spec_helper"
+require "support/shared_examples.rb"
+
+load "pre_commit/checkers/private_key_checker.rb"
 
 RSpec.describe PrivateKeyChecker do
 
   context "code with private keys" do
     subject(:checker) { PrivateKeyChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "Hello") }
-
-    describe "#errors?" do
-      it "should have no errors" do
-        expect(checker.errors?).to be_falsey
-      end
-    end
-
-    describe "#messages" do
-      it "should have no messages" do
-        expect(checker.messages).to be_empty
-      end
-    end
+    it_should_behave_like "it finds no error"
   end
 
   context "code with an a private key indicator" do
     subject(:checker) { PrivateKeyChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "foo; PRIVATE KEY is there!") }
-
-    describe "errors?" do
-      it "should have an errors" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
 
   context "code with an rsa indicator" do
     subject(:checker) { PrivateKeyChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "ssh-rsa follows...") }
-
-    describe "errors?" do
-      it "should have an errors" do
-        expect(checker.errors?).to be_truthy
-      end
-    end
-
-    describe "#messages" do
-      it "should have one message" do
-        expect(checker.messages.count).to eq(1)
-      end
-    end
+    it_should_behave_like "it finds an error"
   end
-
 end
