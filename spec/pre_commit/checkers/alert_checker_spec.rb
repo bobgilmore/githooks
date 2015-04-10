@@ -4,7 +4,7 @@ require "support/shared_examples.rb"
 load "pre_commit/checkers/alert_checker.rb"
 
 RSpec.describe AlertChecker do
-
+  let(:checker_class) { AlertChecker }
   context "code with no alert" do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: ["Hello"]) }
     it_should_behave_like "it finds no error"
