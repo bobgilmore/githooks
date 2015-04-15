@@ -42,11 +42,23 @@ do
 			range="$remote_sha..$local_sha"
 		fi
 
-		# Check for WIP commit
+		# Check for foo commit
 		commit=`git rev-list -n 1 --grep '^foo' "$range"`
 		if [ -n "$commit" ]
 		then
 			echo "ERROR: git pre-push hook found commit message starting with 'foo' in $local_ref"
+			echo "Eliminate the bad commit message by either:"
+			echo "git commit --amend -m 'New commit message'"
+			echo "or by editing the commit message while rebasing the commit."
+			echo "--------------\n"
+			exit 1
+		fi
+
+		# Check for . commit
+		commit=`git rev-list -n 1 --grep '^\.' "$range"`
+		if [ -n "$commit" ]
+		then
+			echo "ERROR: git pre-push hook found commit message starting with '.' in $local_ref"
 			echo "Eliminate the bad commit message by either:"
 			echo "git commit --amend -m 'New commit message'"
 			echo "or by editing the commit message while rebasing the commit."
