@@ -1,12 +1,6 @@
 class RubyVersionChecker
   attr_reader :messages
 
-  HOOK_KEY = "forbid-ruby-version-change"
-
-  def self.deactivation_message
-    PreCommitHelper.deactivation_message("allow", HOOK_KEY)
-  end
-
   def initialize(opts)
     @files = opts[:files]
     @pref_on = !!opts[:pref_on]
@@ -18,7 +12,6 @@ class RubyVersionChecker
   end
 
   def examine_code
-    return [] unless self.class.use_for_project?
     mess = []
     @files.each do |file|
       base = File.basename(file)
@@ -27,13 +20,6 @@ class RubyVersionChecker
       end
     end
     mess
-  end
-
-  private
-
-  def self.use_for_project?
-    val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
-    val.empty? || (val == 'true') || @pref_on
   end
 
 end
