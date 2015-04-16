@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+# A bootstrapping git pre-commit hook that installs some *real* git hooks.
+#
+# I have a great (IMO) git pre-commit hook, but I never remember to install it
+# into new projects.  I can't use
+#
+# git config --global init.templatedir '~/.git_template'
+#
+# to install the GOOD pre-commit hooks, since I want to install *symlinks*
+# to ensure that projects always use the most up-to-date hooks that I have
+# installed on my machine.
+#
+# So, I set up this default hook to install the GOOD hooks automatically.
+
+# Check to see if we have a record of a git repo already installed and still present.
+SYMLINK_SOURCE_REPO = `git config hooks.symlinksourcerepo`.strip
+repo_exists = (!SYMLINK_SOURCE_REPO.strip.empty?) && (File.directory?(SYMLINK_SOURCE_REPO) || File.symlink?(SYMLINK_SOURCE_REPO))
+
+if repo_exists
+  # The user has installed the good hooks into at least one other project,
+  # AND the hooks still exist,
+  # AND we know that the user hasn't installed any "better" hooks in this
+  # repo (otherwise this code wouldn't be running, would it?)
+  # So let's go ahead and install the good hooks here!
+  `#{SYMLINK_SOURCE_REPO}/install_hook_symlinks.sh #{File.dirname(File.dirname(File.dirname(File.expand_path(__FILE__))))}`
+
+  # That installed the symbolic link, so things will stay refreshed forever.
+  # BUT, to trigger the new hooks, we need to error out so that the user will
+  # run git commit AGAIN.
+  message = <<END
+
+A great set of git pre-commit hooks was just installed to this repo.
+Unfortunately, to make them work, this commit had to be aborted.
+Please commit again - they'll work fine from now on.
+
+(More information is available at...
+https://github.com/bobgilmore/githooks )
+
+@bob_gilmore
+END
+
+else
+  message = <<END
+
+Something is wrong with the git hooks bootstrap and installation on this machine.
+
+(More information is available at...
+https://github.com/bobgilmore/githooks#installation )
+
+@bob_gilmore
+
+END
+end
+
+puts message
+exit 1
