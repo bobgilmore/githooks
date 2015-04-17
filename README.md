@@ -55,39 +55,30 @@ Installation
 
 One-Time Configuration
 ------------
-
 1. Clone this repository locally into some central location.  
-2. Run its setup script, passing the location of *a repo that you want to use the hooks with* as an input argument.
+2. Run its setup script, `./setup.sh`
 
-For example...
+This will set the git config variable `init.templatedir`.  As a result...
+1. A custom, *temporary* set of hooks will be installed into any *new* repo.
+2. Those temporary hooks will also be installed into any git repo that you run `git init` in (that isn't as destructive as it sounds!)
 
-```sh
-cd (/someplace/central/for/me/thats/usually/~/code)
-git clone git@github.com:bobgilmore/githooks.git
-cd (into/the/newly-created/repository/directory)
-./setup.sh path_to_repo_that_you_want_to_add_hooks_to
-```
-This will create symbolic links in the `.git` directory of the repo that you're adding to, which will point to this githooks repo.  
+Then, when you commit to a repo with the *temporary* hooks, the temporary hooks will be overwritten by symlinks to the *final* hooks.
 
-No Further Configuration Required (Obsolete, Requires Update)
------------
-Running the setup script once *also* writes its location to the git config variable `hooks.symlinksourcerepo`, used by the git hooks in https://github.com/bobgilmore/dotfiles to provide effective instructions for leveraging the original installation of this repo, rather than prompting the user to re-clone.
-
-Updating the Hooks (Obsolete, Requires Update)
+Updating the Hooks
 ==================
-Since the githook files that you'll be creating in your individual repos are all symbolic links into your (presumably) one local copy of this repo, updating or changing your local copy of this repo will affect *all repos that you set this up for, all at once.*  Note; this goes both ways:
+Since the hook files in your individual repos are all symbolic links into your one local copy of this repo, updating or changing your local copy of this repo will affect *all repos that you set this up for, all at once.*  Note; this goes both ways:
 
 - If you pull updates from Github to your local copy, all of your repos will instantaneously get the updates.
 - If you edit your "local" copy to make a change in one of your project, you're really editing the symlink.  This, in turn, effects *all* of your projects.  Of course, you *could* set up multiple local copies of this repo for different "styles" of project, but read the next section for a better approach.
 
-Advice for Committers (Obsolete, Requires Update)
+Advice for Committers
 ======================
 
 Add Repo-Specific Changes *Conditionally*
 ---------
 Since all of your affected repos have symlinks to one shared set of hooks, don't make project-specific changes to the hook files.  Rather, make the behavior change based on an **optional** git configuration variable, and then set that variable for the projects where it's necessary.
 
-See how I handle `check-ruby-syntax` in the `pre-commit` file for an example of how to do this.
+See how I handle optional checks in, for example, `pre_commit/checkers/spec_is_expected_to_checker.rb`
 
 It's best to add a new checkin its "most stringent" setting, so that people can become aware of if and make an informed decision to deactivate it.
 
@@ -95,4 +86,4 @@ Writing Checks to Run (or Ignore) for Some Extensions or Directories
 ---------
 I don't have many examples of checks that should be run (or ignored) based on extension or directory, so that code isn't really designed to scale.
 
-If you want to add more checks like that, talk to me - we should probably fix that.
+If you want to add more checks like that, talk to me - we should fix that.
