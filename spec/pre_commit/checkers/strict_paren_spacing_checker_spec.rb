@@ -19,6 +19,21 @@ RSpec.describe StrictParenSpacingChecker do
   context "code with a '( '" do
     subject(:checker) { test_class_with_change(checker_class, "Hi ( there") }
     it_should_behave_like "it finds an error"
+
+    context "in a shell script" do
+      subject(:checker) { test_class_with_change(checker_class, "Hi ( there", file: "foo.sh") }
+      it_should_behave_like "it finds no error"
+    end
+
+    context "in an extensionless shell script" do
+      subject(:checker) { test_class_with_change(checker_class, "Hi ( there", file: "foo") }
+      it_should_behave_like "it finds no error"
+    end
+
+    context "in a bash script" do
+      subject(:checker) { test_class_with_change(checker_class, "Hi ( there", file: "foo.bash") }
+      it_should_behave_like "it finds no error"
+    end
   end
 
   context "code with a ' )'" do

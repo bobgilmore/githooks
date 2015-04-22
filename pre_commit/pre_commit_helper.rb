@@ -9,6 +9,10 @@ module PreCommitHelper
     return nil
   end
 
+  def self.check_file_in_directory?(file, directory, extensions_to_ignore = [])
+    !extensions_to_ignore.include?(File.extname(file)) && !PreCommitHelper.directory_excluded_from_checks?(directory)
+  end
+
   def self.deactivation_message(to_permanently_blank_for_repo, key)
     %{\nTo permanently #{to_permanently_blank_for_repo} for this repo, run\ngit config hooks.#{key} false\n\nTo permanently #{to_permanently_blank_for_repo} for *all* repos, run\ngit config --global hooks.#{key} false\n}
   end
