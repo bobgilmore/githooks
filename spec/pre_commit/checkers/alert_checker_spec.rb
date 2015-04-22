@@ -13,6 +13,16 @@ RSpec.describe AlertChecker do
   context "code with an alert" do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: ["x=3", "alert('error')"]) }
     it_should_behave_like "it finds an error"
+
+    context "in an Objective-C file" do
+      subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.m", changes: ["x=3", "alert('error')"]) }
+      it_should_behave_like "it finds no error"
+    end
+
+    context "in a Swift file" do
+      subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.swift", changes: ["x=3", "alert('error')"]) }
+      it_should_behave_like "it finds no error"
+    end
   end
 
   context "code with a flash[:alert]" do

@@ -14,7 +14,7 @@ class AlertChecker
 
   def examine_code
     mess = []
-    if !PreCommitHelper.directory_excluded_from_checks?(@dir)
+    if !EXTENSIONS_TO_IGNORE.include?(File.extname(@file)) && !PreCommitHelper.directory_excluded_from_checks?(@dir)
       @changed_code_array.each do |changed_code_line|
         if changed_code_line.match(ALERT) && !changed_code_line.match(FLASH)
           mess << warning_message()
@@ -29,6 +29,8 @@ class AlertChecker
   def warning_message
     %{"alert" in #{@file}}
   end
+
+  EXTENSIONS_TO_IGNORE = [ '.m', '.swift']
 
   FLASH = /flash\s*\[\s*:alert\s*\]/
   ALERT = /alert/
