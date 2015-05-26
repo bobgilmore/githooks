@@ -65,6 +65,16 @@ RSpec.describe StrictParenSpacingChecker do
 
     subject(:checker) { test_class_with_change(checker_class, code) }
     it_should_behave_like "it finds an error"
+
+    context "in an Elixir file" do
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.ex") }
+      it_should_behave_like "it finds no error"
+    end
+
+    context "in an Elixir script file" do
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.exs") }
+      it_should_behave_like "it finds no error"
+    end
   end
 
   context "code with a ' ]'" do
@@ -72,6 +82,16 @@ RSpec.describe StrictParenSpacingChecker do
 
     subject(:checker) { test_class_with_change(checker_class, code) }
     it_should_behave_like "it finds an error"
+
+    context "in an Elixir file" do
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.ex") }
+      it_should_behave_like "it finds no error"
+    end
+
+    context "in an Elixir script file" do
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.exs") }
+      it_should_behave_like "it finds no error"
+    end
   end
 
   context "code with two copies of the same error '( '" do

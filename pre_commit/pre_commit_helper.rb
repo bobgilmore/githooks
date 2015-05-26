@@ -9,8 +9,12 @@ module PreCommitHelper
     return nil
   end
 
+  def self.check_file?(file, extensions_to_ignore = [])
+    !extensions_to_ignore.include?(File.extname(file))
+  end
+
   def self.check_file_in_directory?(file, directory, extensions_to_ignore = [])
-    !extensions_to_ignore.include?(File.extname(file)) && !PreCommitHelper.directory_excluded_from_checks?(directory)
+    PreCommitHelper.check_file?(file, extensions_to_ignore) && !PreCommitHelper.directory_excluded_from_checks?(directory)
   end
 
   def self.deactivation_message(to_permanently_blank_for_repo, key)

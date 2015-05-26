@@ -20,11 +20,13 @@ class StrictParenSpacingChecker
   def examine_code
     return [] unless self.class.use_for_project?
     mess = []
-    if PreCommitHelper.check_file_in_directory?(@file, @dir, EXTENSIONS_TO_IGNORE)
-      mess << warning_message(OPEN_SMOOTH_SPACE)  if @changed_code.match(OPEN_SMOOTH_SPACE_REGEXP)
+    if PreCommitHelper.check_file_in_directory?(@file, @dir, EXTENSIONS_TO_IGNORE_ALL)
+      mess << warning_message(OPEN_SMOOTH_SPACE) if @changed_code.match(OPEN_SMOOTH_SPACE_REGEXP)
       mess << warning_message(SPACE_CLOSE_SMOOTH) if @changed_code.match(SPACE_CLOSE_SMOOTH_REGEXP)
-      mess << warning_message(OPEN_SQUARE_SPACE)  if @changed_code.match(OPEN_SQUARE_SPACE_REGEXP)
-      mess << warning_message(SPACE_CLOSE_SQUARE) if @changed_code.match(SPACE_CLOSE_SQUARE_REGEXP)
+      if PreCommitHelper.check_file_in_directory?(@file, @dir, EXTENSIONS_TO_IGNORE_SQUARE)
+        mess << warning_message(OPEN_SQUARE_SPACE) if @changed_code.match(OPEN_SQUARE_SPACE_REGEXP)
+        mess << warning_message(SPACE_CLOSE_SQUARE) if @changed_code.match(SPACE_CLOSE_SQUARE_REGEXP)
+      end
     end
     mess
   end
@@ -42,7 +44,11 @@ class StrictParenSpacingChecker
 
   HOOK_KEY = "require-strict-paren-spacing"
 
-  EXTENSIONS_TO_IGNORE = ['.sh', '.bash', '']
+  SHELL_EXTENSIONS = ['.sh', '.bash', '']
+  EXTENSIONS_TO_IGNORE_ALL = SHELL_EXTENSIONS
+
+  ELIXIR_EXTENSIONS = [".ex", ".exs"]
+  EXTENSIONS_TO_IGNORE_SQUARE = ELIXIR_EXTENSIONS
 
   OPEN_SMOOTH_SPACE  = "( "
   SPACE_CLOSE_SMOOTH = " )"
