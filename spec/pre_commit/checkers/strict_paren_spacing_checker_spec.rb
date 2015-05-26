@@ -17,37 +17,60 @@ RSpec.describe StrictParenSpacingChecker do
   end
 
   context "code with a '( '" do
-    subject(:checker) { test_class_with_change(checker_class, "Hi ( there") }
+    let(:code) { "Hi ( there" }
+
+    subject(:checker) { test_class_with_change(checker_class, code) }
     it_should_behave_like "it finds an error"
 
     context "in a shell script" do
-      subject(:checker) { test_class_with_change(checker_class, "Hi ( there", file: "foo.sh") }
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.sh") }
       it_should_behave_like "it finds no error"
     end
 
     context "in an extensionless shell script" do
-      subject(:checker) { test_class_with_change(checker_class, "Hi ( there", file: "foo") }
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo") }
       it_should_behave_like "it finds no error"
     end
 
     context "in a bash script" do
-      subject(:checker) { test_class_with_change(checker_class, "Hi ( there", file: "foo.bash") }
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.bash") }
       it_should_behave_like "it finds no error"
     end
   end
 
   context "code with a ' )'" do
-    subject(:checker) { test_class_with_change(checker_class, "Hi (there )") }
+    let(:code) { "Hi (there )" }
+
+    subject(:checker) { test_class_with_change(checker_class, code) }
     it_should_behave_like "it finds an error"
+
+    context "in a shell script" do
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.sh") }
+      it_should_behave_like "it finds no error"
+    end
+
+    context "in an extensionless shell script" do
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo") }
+      it_should_behave_like "it finds no error"
+    end
+
+    context "in a bash script" do
+      subject(:checker) { test_class_with_change(checker_class, code, file: "foo.bash") }
+      it_should_behave_like "it finds no error"
+    end
   end
 
   context "code with a '[ '" do
-    subject(:checker) { test_class_with_change(checker_class, "Hi [ there") }
+    let(:code) { "Hi [ there" }
+
+    subject(:checker) { test_class_with_change(checker_class, code) }
     it_should_behave_like "it finds an error"
   end
 
   context "code with a ' ]'" do
-    subject(:checker) { test_class_with_change(checker_class, "Hi there ]") }
+    let(:code) { "Hi there ]" }
+
+    subject(:checker) { test_class_with_change(checker_class, code) }
     it_should_behave_like "it finds an error"
   end
 
