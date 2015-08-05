@@ -34,6 +34,7 @@ class StrictParenSpacingChecker
   private
 
   def self.use_for_project?
+    return false if PreCommitHelper.project_type == :xcode
     val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
     val.empty? || (val == 'true') || @pref_on
   end
