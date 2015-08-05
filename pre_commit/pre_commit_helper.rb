@@ -1,11 +1,9 @@
 module PreCommitHelper
 
-  def self.project_type
-    toplevel = `git rev-parse --show-toplevel`.strip
-    gemfile = File.join(toplevel, 'Gemfile')
-    return :ruby if File.exist?(gemfile)
-    package_json = File.join(toplevel, 'package.json')
-    return :node if File.exist?(package_json)
+  def self.project_type(toplevel = `git rev-parse --show-toplevel`.strip)
+    return :ruby if File.exist?(File.join(toplevel, 'Gemfile'))
+    return :node if File.exist?(File.join(toplevel, 'package.json'))
+    return :xcode if Dir.glob(File.join(toplevel, '*.xcodeproj')).any?
     return nil
   end
 

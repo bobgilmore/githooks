@@ -23,8 +23,38 @@ RSpec.describe PreCommitHelper do
   end
 
   describe ".project_type" do
-    it "should return :ruby" do
-      expect(PreCommitHelper.project_type).to eq :ruby 
+    let(:sample_dir) { "#{File.dirname(__FILE__)}/sample_projects" }
+
+    context "in a ruby directory" do
+      let(:dir) { project_dir("ruby") }
+
+      it "should return :ruby" do
+        expect(PreCommitHelper.project_type(dir)).to eq :ruby
+      end
+    end
+
+    context "in a node directory" do
+      let(:dir) { project_dir("node") }
+
+      it "should return :node" do
+        expect(PreCommitHelper.project_type(dir)).to eq :node
+      end
+    end
+
+    context "in an xcode directory" do
+      let(:dir) { project_dir("xcode") }
+
+      it "should return :xcode" do
+        expect(PreCommitHelper.project_type(dir)).to eq :xcode
+      end
+    end
+
+    context "in an unknown directory" do
+      let(:dir) { project_dir("unknown") }
+
+      it "should return nil" do
+        expect(PreCommitHelper.project_type(dir)).to be_falsey
+      end
     end
   end
 
@@ -101,5 +131,9 @@ RSpec.describe PreCommitHelper do
       end
 
     end
+  end
+
+  def project_dir(project_type)
+    "#{File.dirname(__FILE__)}/sample_projects/#{project_type}_project"
   end
 end
