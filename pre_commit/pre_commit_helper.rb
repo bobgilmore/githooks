@@ -1,5 +1,7 @@
 module PreCommitHelper
 
+  EXTENSIONS_RUBY = [".rb"]
+
   def self.project_type(toplevel = `git rev-parse --show-toplevel`.strip)
     return :ruby if File.exist?(File.join(toplevel, 'Gemfile'))
     return :node if File.exist?(File.join(toplevel, 'package.json'))
