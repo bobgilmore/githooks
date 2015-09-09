@@ -7,6 +7,8 @@ class SimpleDeactivatableRegexpChecker
     @changed_code = opts[:changes]
     @hook_key = opts[:hook_key]
     @regexp = opts[:regexp]
+    @extensions_to_include = opts[:extensions_to_include]
+    @extensions_to_ignore = opts[:extensions_to_ignore]
     @warning_message = opts[:warning_message]
 
     @pref_on = !!opts[:pref_on]
@@ -19,10 +21,9 @@ class SimpleDeactivatableRegexpChecker
 
   def examine_code
     return [] unless use_for_project?
+    return [] unless check_file_based_on_extension?
     mess = []
-    if !PreCommitHelper.directory_excluded_from_checks?(@dir)
-      mess << @warning_message if @changed_code.match(@regexp)
-    end
+    mess << @warning_message if !PreCommitHelper.directory_excluded_from_all_checks?(@dir) && @changed_code.match(@regexp)
     mess
   end
 
@@ -33,4 +34,7 @@ class SimpleDeactivatableRegexpChecker
     val.empty? || (val == 'true') || @pref_on
   end
 
+  def check_file_based_on_extension?
+    PreCommitHelper.check_file?(file: @file, extensions_to_include: @extensions_to_include, extensions_to_exclude: @extensions_to_exclude)
+  end
 end

@@ -7,19 +7,27 @@ module PreCommitHelper
     return nil
   end
 
-  def self.check_file?(file, extensions_to_ignore = [])
-    !extensions_to_ignore.include?(File.extname(file))
+  def self.check_file?(params)
+    raise "extension_to_include and extensions_to_ignore are both included. Behavior undetermined." if !params[:extensions_to_include].nil? && !params[:extensions_to_ignore].nil?
+    ext = File.extname(params[:file])
+    if params[:extensions_to_include]
+      params[:extensions_to_include].include?(ext)
+    elsif params[:extensions_to_ignore]
+      !params[:extensions_to_ignore].include?(ext)
+    else
+      true
+    end
   end
 
-  def self.check_file_in_directory?(file, directory, extensions_to_ignore = [])
-    PreCommitHelper.check_file?(file, extensions_to_ignore) && !PreCommitHelper.directory_excluded_from_checks?(directory)
+  def self.check_file_in_directory?(params)
+    PreCommitHelper.check_file?(params) && !PreCommitHelper.directory_excluded_from_all_checks?(params[:directory])
   end
 
   def self.deactivation_message(to_permanently_blank_for_repo, key)
     %{\nTo permanently #{to_permanently_blank_for_repo} for this repo, run\ngit config hooks.#{key} false\n\nTo permanently #{to_permanently_blank_for_repo} for *all* repos, run\ngit config --global hooks.#{key} false\n}
   end
 
-  def self.directory_excluded_from_checks?(directory)
+  def self.directory_excluded_from_all_checks?(directory)
     !!(/assets\// =~ directory && /\/vendor/ =~ directory)
   end
 
