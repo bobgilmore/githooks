@@ -2,17 +2,43 @@ load "pre_commit/pre_commit_helper.rb"
 require "spec_helper"
 
 RSpec.describe PreCommitHelper do
-  describe ".directory_excluded_from_checks?" do
+  describe ".directory_excluded_from_all_checks?" do
     it "should return false for a random directory" do
-      expect(PreCommitHelper.directory_excluded_from_checks?("/home/foo/bar")).to be_falsey
+      expect(PreCommitHelper.directory_excluded_from_all_checks?("/home/foo/bar")).to be_falsey
     end
 
     it "should return true for an assets/**/vendor directory" do
-      expect(PreCommitHelper.directory_excluded_from_checks?("/my/dir/assets/images/vendor/foo")).to be_truthy
+      expect(PreCommitHelper.directory_excluded_from_all_checks?("/my/dir/assets/images/vendor/foo")).to be_truthy
     end
 
     it "should return false for an assets directory" do
-      expect(PreCommitHelper.directory_excluded_from_checks?("/my/dir/assets/foo")).to be_falsey
+      expect(PreCommitHelper.directory_excluded_from_all_checks?("/my/dir/assets/foo")).to be_falsey
+    end
+  end
+
+  describe ".check_file?" do
+    it "should return true if no extensions are specified" do
+      expect(PreCommitHelper.check_file?(file: "/home/foo/bar.a")).to be_truthy
+    end
+
+    it "should return true if there is a match to extensions_to_include" do
+      expect(PreCommitHelper.check_file?(file: "/home/foo/bar.a", extensions_to_include: [".a", ".b"])).to be_truthy
+    end
+
+    it "should return false if there is a match to extensions_to_include" do
+      expect(PreCommitHelper.check_file?(file: "/home/foo/bar.a", extensions_to_include: [".c", ".d"])).to be_falsey
+    end
+
+    it "should return false if there is a match to extensions_to_ignore" do
+      expect(PreCommitHelper.check_file?(file: "/home/foo/bar.a", extensions_to_ignore: [".a", ".b"])).to be_falsey
+    end
+
+    it "should return true if there is a match to extensions_to_ignore" do
+      expect(PreCommitHelper.check_file?(file: "/home/foo/bar.a", extensions_to_ignore: [".c", ".d"])).to be_truthy
+    end
+
+    it "should raise an error is both extensions_to_include and extensions_to_ignore are included" do
+      expect { PreCommitHelper.check_file?(file: "/home/foo/bar.a", extensions_to_ignore: [".a"], extensions_to_include: [".b"]) }.to raise_error
     end
   end
 

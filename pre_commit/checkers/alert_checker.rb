@@ -14,7 +14,7 @@ class AlertChecker
 
   def examine_code
     mess = []
-    if PreCommitHelper.check_file_in_directory?(@file, @dir, EXTENSIONS_TO_IGNORE)
+    if PreCommitHelper.check_file_in_directory?(file: @file, directory: @dir, extensions_to_ignore: EXTENSIONS_TO_IGNORE)
       @changed_code_array.each do |changed_code_line|
         if changed_code_line.match(ALERT) && !changed_code_line.match(FLASH)
           mess << warning_message()
