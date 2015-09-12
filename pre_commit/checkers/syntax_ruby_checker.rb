@@ -35,8 +35,7 @@ class SyntaxRubyChecker
   private
 
   def self.use_for_project?
-    val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
-    val.empty? || (val == 'true') || @force_pref_on
+    !PreCommitHelper.disabled_via_preference?(HOOK_KEY, @force_pref_on)
   end
 
   def warning_message(fullfile)

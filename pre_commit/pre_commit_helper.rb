@@ -33,6 +33,11 @@ module PreCommitHelper
     !!(/assets\// =~ directory && /\/vendor/ =~ directory)
   end
 
+  def self.disabled_via_preference?(hook_key, force_pref_on = false)
+    val = PreCommitHelper.git_config_val_for_hook(hook_key)
+    !(val.empty? || (val == 'true') || force_pref_on)
+  end
+
   def self.git_config_val_for_hook(hook_name)
     `git config hooks.#{hook_name}`.strip
   end
