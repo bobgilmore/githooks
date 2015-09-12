@@ -3,7 +3,7 @@ class RubyVersionChecker
 
   def initialize(opts)
     @files = opts[:files]
-    @pref_on = !!opts[:pref_on]
+    @force_pref_on = opts[:force_pref_on]
     @messages = examine_code
   end
 

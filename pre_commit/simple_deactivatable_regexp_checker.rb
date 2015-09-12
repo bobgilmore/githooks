@@ -11,7 +11,7 @@ class SimpleDeactivatableRegexpChecker
     @extensions_to_ignore = opts[:extensions_to_ignore]
     @warning_message = opts[:warning_message]
 
-    @pref_on = !!opts[:pref_on]
+    @force_pref_on = opts[:force_pref_on]
     @messages = examine_code
   end
 
@@ -31,7 +31,7 @@ class SimpleDeactivatableRegexpChecker
 
   def use_for_project?
     val = PreCommitHelper.git_config_val_for_hook(@hook_key)
-    val.empty? || (val == 'true') || @pref_on
+    val.empty? || (val == 'true') || @force_pref_on
   end
 
   def check_file_based_on_extension?

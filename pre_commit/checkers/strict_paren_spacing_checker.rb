@@ -9,7 +9,7 @@ class StrictParenSpacingChecker
     @dir = opts[:dir]
     @file = opts[:file]
     @changed_code = opts[:changes]
-    @pref_on = !!opts[:pref_on]
+    @force_pref_on = opts[:force_pref_on]
     @messages = examine_code
   end
 
@@ -36,7 +36,7 @@ class StrictParenSpacingChecker
   def self.use_for_project?
     return false if PreCommitHelper.project_type == :xcode
     val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
-    val.empty? || (val == 'true') || @pref_on
+    val.empty? || (val == 'true') || @force_pref_on
   end
 
   def warning_message(bad_expression)

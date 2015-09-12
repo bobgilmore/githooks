@@ -8,7 +8,7 @@ class SyntaxRubyChecker
   def initialize(opts)
     @toplevel = opts[:toplevel]
     @files = opts[:files]
-    @pref_on = !!opts[:pref_on]
+    @force_pref_on = opts[:force_pref_on]
     @messages = examine_code
   end
 
@@ -36,7 +36,7 @@ class SyntaxRubyChecker
 
   def self.use_for_project?
     val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
-    val.empty? || (val == 'true') || @pref_on
+    val.empty? || (val == 'true') || @force_pref_on
   end
 
   def warning_message(fullfile)
