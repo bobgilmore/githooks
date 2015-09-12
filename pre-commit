@@ -46,24 +46,24 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     
     changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
 
-    res.record(AlertChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(AlertChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
     res.record(ForbiddenStringChecker.new(file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(PrivateKeyChecker.new(directory: dir, file: file, changes: changed_code_for_file))
-    res.record(RspecExpectToReceiveChecker.new(directory: dir, file: file, changes: changed_code_for_file))
-    res.record(RspecIsExpectedToChecker.new(directory: dir, file: file, changes: changed_code_for_file))
-    res.record(RspecShouldEqualChecker.new(directory: dir, file: file, changes: changed_code_for_file))
-    res.record(RspecToNotChecker.new(directory: dir, file: file, changes: changed_code_for_file))
-    res.record(RubyNoThrowChecker.new(directory: dir, file: file, changes: changed_code_for_file))
-    res.record(StrictParenSpacingChecker.new(directory: dir, file: file, changes: changed_code_for_file))
-    res.record(UserHomeChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(PrivateKeyChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(RspecExpectToReceiveChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(RspecIsExpectedToChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(RspecShouldEqualChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(RspecToNotChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(RubyNoThrowChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(StrictParenSpacingChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(UserHomeChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
   end
 end
 
 name_only_array = `git diff --cached --name-only`.split(/\n/)
 toplevel = `git rev-parse --show-toplevel`
 
-res.record(SyntaxRubyChecker.new(toplevel: toplevel, files: name_only_array))
-res.record(RubyVersionChecker.new(files: name_only_array))
+res.record(SyntaxRubyChecker.new(toplevel: toplevel, files: name_only_array, project_type: PROJECT_TYPE))
+res.record(RubyVersionChecker.new(files: name_only_array, project_type: PROJECT_TYPE))
 
 # Report errors and fail the commit if necessary
 if res.errors?

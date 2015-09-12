@@ -9,6 +9,7 @@ class StrictParenSpacingChecker
     @dir = opts[:dir]
     @file = opts[:file]
     @changed_code = opts[:changes]
+    @project_type = opts[:project_type]
     @force_pref_on = opts[:force_pref_on]
     @messages = examine_code
   end
@@ -18,7 +19,7 @@ class StrictParenSpacingChecker
   end
 
   def examine_code
-    return [] if PreCommitHelper.project_type == :xcode
+    return [] if @project_type == :xcode
     return [] if disabled_via_preference?
     mess = []
     if PreCommitHelper.check_file_in_directory?(file: @file, directory: @dir, extensions_to_ignore: EXTENSIONS_TO_IGNORE_ALL)

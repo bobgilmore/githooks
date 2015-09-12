@@ -1,5 +1,5 @@
 class ForbiddenStringChecker
-  attr_reader :messages, :project_type
+  attr_reader :messages
 
   def initialize(opts)
     @file = opts[:file]
