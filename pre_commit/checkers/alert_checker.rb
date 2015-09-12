@@ -4,7 +4,7 @@ class AlertChecker
   def initialize(opts)
     @dir = opts[:dir]
     @file = opts[:file]
-    @changed_code_array = opts[:changes]
+    @changed_code_array = opts[:changes].split("\n")
     @messages = examine_code
   end
 
