@@ -35,6 +35,6 @@ class SimpleDeactivatableRegexpChecker
   end
 
   def check_file_based_on_extension?
-    PreCommitHelper.check_file?(file: @file, extensions_to_include: @extensions_to_include, extensions_to_exclude: @extensions_to_exclude)
+    PreCommitHelper.check_file_based_on_extension?(file: @file, extensions_to_include: @extensions_to_include, extensions_to_exclude: @extensions_to_exclude)
   end
 end

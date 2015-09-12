@@ -9,7 +9,7 @@ module PreCommitHelper
     return nil
   end
 
-  def self.check_file?(params)
+  def self.check_file_based_on_extension?(params)
     raise "extension_to_include and extensions_to_ignore are both included. Behavior undetermined." if !params[:extensions_to_include].nil? && !params[:extensions_to_ignore].nil?
     ext = File.extname(params[:file])
     if params[:extensions_to_include]
@@ -22,7 +22,7 @@ module PreCommitHelper
   end
 
   def self.check_file_in_directory?(params)
-    PreCommitHelper.check_file?(params) && !PreCommitHelper.directory_excluded_from_all_checks?(params[:directory])
+    PreCommitHelper.check_file_based_on_extension?(params) && !PreCommitHelper.directory_excluded_from_all_checks?(params[:directory])
   end
 
   def self.deactivation_message(to_permanently_blank_for_repo, key)
