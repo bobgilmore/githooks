@@ -20,20 +20,27 @@ class SimpleDeactivatableRegexpChecker
   end
 
   def examine_code
-    return [] unless use_for_project?
+    return [] if directory_excluded_from_all_checks?
+    return [] if disabled_via_preference?
     return [] unless check_file_based_on_extension?
-    mess = []
-    mess << @warning_message if !PreCommitHelper.directory_excluded_from_all_checks?(@dir) && @changed_code.match(@regexp)
-    mess
+    message = []
+    message << @warning_message if @changed_code.match(@regexp)
+    message
   end
 
   private
 
-  def use_for_project?
-    !PreCommitHelper.disabled_via_preference?(@hook_key, @force_pref_on)
+  def directory_excluded_from_all_checks?
+    PreCommitHelper.directory_excluded_from_all_checks?(@dir)
+  end
+
+  def disabled_via_preference?
+    PreCommitHelper.disabled_via_preference?(@hook_key, @force_pref_on)
   end
 
   def check_file_based_on_extension?
-    PreCommitHelper.check_file_based_on_extension?(file: @file, extensions_to_include: @extensions_to_include, extensions_to_exclude: @extensions_to_exclude)
+    PreCommitHelper.check_file_based_on_extension?(file: @file,
+      extensions_to_include: @extensions_to_include,
+      extensions_to_exclude: @extensions_to_exclude)
   end
 end

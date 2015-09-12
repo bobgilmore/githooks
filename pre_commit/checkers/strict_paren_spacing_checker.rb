@@ -18,7 +18,8 @@ class StrictParenSpacingChecker
   end
 
   def examine_code
-    return [] unless use_for_project?
+    return [] if PreCommitHelper.project_type == :xcode
+    return [] if disabled_via_preference?
     mess = []
     if PreCommitHelper.check_file_in_directory?(file: @file, directory: @dir, extensions_to_ignore: EXTENSIONS_TO_IGNORE_ALL)
       mess << warning_message(OPEN_SMOOTH_SPACE) if @changed_code.match(OPEN_SMOOTH_SPACE_REGEXP)
@@ -33,9 +34,8 @@ class StrictParenSpacingChecker
 
   private
 
-  def use_for_project?
-    return false if PreCommitHelper.project_type == :xcode
-    !PreCommitHelper.disabled_via_preference?(HOOK_KEY, @force_pref_on)
+  def disabled_via_preference?
+    PreCommitHelper.disabled_via_preference?(HOOK_KEY, @force_pref_on)
   end
 
   def warning_message(bad_expression)

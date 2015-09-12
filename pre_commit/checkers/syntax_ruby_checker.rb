@@ -17,7 +17,7 @@ class SyntaxRubyChecker
   end
 
   def examine_code
-    return [] unless use_for_project?
+    return [] if disabled_via_preference?
     mess = []
     @files.each do |file|
       if File.extname(file) == '.rb'
@@ -34,8 +34,8 @@ class SyntaxRubyChecker
 
   private
 
-  def use_for_project?
-    !PreCommitHelper.disabled_via_preference?(HOOK_KEY, @force_pref_on)
+  def disabled_via_preference?
+    PreCommitHelper.disabled_via_preference?(HOOK_KEY, @force_pref_on)
   end
 
   def warning_message(fullfile)
