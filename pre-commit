@@ -31,6 +31,7 @@ NON_CHECKED_FILE_NAMES = [
 ]
 
 PROJECT_TYPE = PreCommitHelper::project_type
+TOPLEVEL = `git rev-parse --show-toplevel`
 
 res = CheckerResults.new
 
@@ -45,7 +46,11 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     dir = File.dirname(file)
     changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
 
-    diff_data = { directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE }
+    diff_data = { directory: dir,
+      file: file,
+      changes: changed_code_for_file,
+      toplevel: TOPLEVEL,
+      project_type: PROJECT_TYPE }
 
     res.record(AlertChecker.new(diff_data))
     res.record(ForbiddenStringChecker.new(diff_data))
@@ -57,14 +62,10 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
     res.record(RubyNoThrowChecker.new(diff_data))
     res.record(StrictParenSpacingChecker.new(diff_data))
     res.record(UserHomeChecker.new(diff_data))
+    res.record(RubyVersionChecker.new(diff_data))
+    res.record(SyntaxRubyChecker.new(diff_data))
   end
 end
-
-name_only_array = `git diff --cached --name-only`.split(/\n/)
-toplevel = `git rev-parse --show-toplevel`
-
-res.record(SyntaxRubyChecker.new(toplevel: toplevel, files: name_only_array, project_type: PROJECT_TYPE))
-res.record(RubyVersionChecker.new(files: name_only_array, project_type: PROJECT_TYPE))
 
 # Report errors and fail the commit if necessary
 if res.errors?

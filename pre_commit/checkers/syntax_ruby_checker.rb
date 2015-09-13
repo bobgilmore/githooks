@@ -7,7 +7,8 @@ class SyntaxRubyChecker
 
   def initialize(opts)
     @toplevel = opts[:toplevel]
-    @files = opts[:files]
+    @file = opts[:file]
+    @dir = opts[:directory]
     @force_pref_on = opts[:force_pref_on]
     @messages = examine_code
   end
@@ -19,14 +20,12 @@ class SyntaxRubyChecker
   def examine_code
     return [] if disabled_via_preference?
     mess = []
-    @files.each do |file|
-      if File.extname(file) == '.rb'
-        fullfile = File.join(@toplevel.strip, file)
-        if File.exist?(fullfile)
-          output = `ruby -c #{fullfile}`
-          status = $?.success?
-          mess <<  warning_message(fullfile) unless status
-        end
+    if File.extname(@file) == '.rb'
+      fullfile = File.join(@toplevel.strip, @dir, @file)
+      if File.exist?(fullfile)
+        output = `ruby -c #{fullfile}`
+        status = $?.success?
+        mess << warning_message(fullfile) unless status
       end
     end
     mess
