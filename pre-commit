@@ -43,19 +43,20 @@ full_diff = `git diff --cached --`.encode("UTF-8")
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   unless (NON_CHECKED_FILE_NAMES.include?(file) || NON_CHECKED_FILE_EXTENSIONS.include?(File.extname(file)))
     dir = File.dirname(file)
-    
     changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
 
-    res.record(AlertChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(ForbiddenStringChecker.new(file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(PrivateKeyChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(RspecExpectToReceiveChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(RspecIsExpectedToChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(RspecShouldEqualChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(RspecToNotChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(RubyNoThrowChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(StrictParenSpacingChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
-    res.record(UserHomeChecker.new(directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    diff_data = { directory: dir, file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE }
+
+    res.record(AlertChecker.new(diff_data))
+    res.record(ForbiddenStringChecker.new(diff_data))
+    res.record(PrivateKeyChecker.new(diff_data))
+    res.record(RspecExpectToReceiveChecker.new(diff_data))
+    res.record(RspecIsExpectedToChecker.new(diff_data))
+    res.record(RspecShouldEqualChecker.new(diff_data))
+    res.record(RspecToNotChecker.new(diff_data))
+    res.record(RubyNoThrowChecker.new(diff_data))
+    res.record(StrictParenSpacingChecker.new(diff_data))
+    res.record(UserHomeChecker.new(diff_data))
   end
 end
 
