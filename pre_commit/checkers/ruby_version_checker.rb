@@ -16,9 +16,9 @@ class RubyVersionChecker
     mess << %{Edit to #{@file} - you probably didn't mean to do commit that.} if file_is_forbidden?
     mess
   end
-  
+
   private
-  
+
   def file_is_forbidden?
     @file == '.ruby-version' || @file == '.rbenv-version'
   end

@@ -29,12 +29,12 @@ RSpec.describe AlertChecker do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "x=3\nflash[:alert] = 'Nooooo!'") }
     it_should_behave_like "it finds no error"
   end
-  
+
   context "code with flash and alert, but not on the same line" do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "x=3\nflash[:error] = 'Nooooo!'\nfoo(:alert)") }
     it_should_behave_like "it finds an error"
   end
-  
+
   context "code with alert AND a valid flash[:alert] on a different line" do
     subject(:checker) { AlertChecker.new(directory: "/usr/local", file: "fizzbuzz.rb", changes: "x=3\nflash[:alert] = 'Nooooo!'\nalert('hi')") }
     it_should_behave_like "it finds an error"
