@@ -34,7 +34,6 @@ PROJECT_TYPE = PreCommitHelper::project_type
 TOPLEVEL = `git rev-parse --show-toplevel`
 
 res = CheckerResults.new
-
 # Loop over ALL errors and warnings and return ALL problems.
 # I want to report on *all* problems that exist in the commit before aborting,
 # so that anyone calling --no-verify has been informed of all problems first.
@@ -52,18 +51,9 @@ full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, 
       toplevel: TOPLEVEL,
       project_type: PROJECT_TYPE }
 
-    res.record(AlertChecker.new(diff_data))
-    res.record(ForbiddenStringChecker.new(diff_data))
-    res.record(PrivateKeyChecker.new(diff_data))
-    res.record(RspecExpectToReceiveChecker.new(diff_data))
-    res.record(RspecIsExpectedToChecker.new(diff_data))
-    res.record(RspecShouldEqualChecker.new(diff_data))
-    res.record(RspecToNotChecker.new(diff_data))
-    res.record(RubyNoThrowChecker.new(diff_data))
-    res.record(StrictParenSpacingChecker.new(diff_data))
-    res.record(UserHomeChecker.new(diff_data))
-    res.record(RubyVersionChecker.new(diff_data))
-    res.record(SyntaxRubyChecker.new(diff_data))
+    PreCommitHelper.checker_classes.each do |checker_class|
+      res.record(checker_class.new(diff_data))
+    end
   end
 end
 

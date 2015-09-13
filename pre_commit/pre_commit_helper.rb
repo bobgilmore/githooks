@@ -1,5 +1,4 @@
 module PreCommitHelper
-
   EXTENSIONS_RUBY = [".rb"]
 
   def self.project_type(toplevel = `git rev-parse --show-toplevel`.strip)
@@ -56,4 +55,15 @@ module PreCommitHelper
     ret
   end
 
+  def self.checker_classes
+    return @checker_classes if @checker_classes
+    @checker_classes = []
+    checker_file_spec = File.dirname(__FILE__) + "/checkers/*_checker.rb"
+    Dir.glob(checker_file_spec).each do |checker_file|
+      file_name = File.basename(checker_file, ".rb")
+      class_name = file_name.gsub(/^[a-z0-9]|_[a-z0-9]/) { |a| a.upcase }.gsub(/_/, "")
+      @checker_classes << Object.const_get(class_name)
+    end
+    @checker_classes
+  end
 end
