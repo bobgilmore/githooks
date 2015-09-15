@@ -6,7 +6,7 @@ class SimpleDeactivatableRegexpChecker
     @file = opts[:file]
     @changed_code = opts[:changes]
     @hook_key = opts[:hook_key]
-    @regexp = opts[:regexp]
+    @regexp_code = opts[:regexp_code]
     @extensions_to_include = opts[:extensions_to_include]
     @extensions_to_ignore = opts[:extensions_to_ignore]
     @warning_message = opts[:warning_message]
@@ -24,7 +24,7 @@ class SimpleDeactivatableRegexpChecker
     return [] if disabled_via_preference?
     return [] unless check_file_based_on_extension?
     message = []
-    message << @warning_message if @changed_code.match(@regexp)
+    message << @warning_message if @changed_code.match(@regexp_code)
     message
   end
 
