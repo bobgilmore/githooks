@@ -5,7 +5,6 @@ class ForbiddenStringChecker
     @file = opts[:file]
     @changed_code = opts[:changes]
     @project_type = opts[:project_type]
-
     @messages = examine_code
   end
 

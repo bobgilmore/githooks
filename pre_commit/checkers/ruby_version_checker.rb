@@ -12,9 +12,7 @@ class RubyVersionChecker
   end
 
   def examine_code
-    mess = []
-    mess << %{Edit to #{@file} - you probably didn't mean to do commit that.} if file_is_forbidden?
-    mess
+    file_is_forbidden? ? [%{Edit to #{@file} - you probably didn't mean to do commit that.}] : []
   end
 
   private

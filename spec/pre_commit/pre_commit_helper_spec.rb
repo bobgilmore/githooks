@@ -101,18 +101,6 @@ RSpec.describe PreCommitHelper do
         expect(checker).to_not receive(:messages)
         expect(checker_class).to_not receive(:deactivation_message)
       end
-
-      context "when passed false" do
-        it "should return false" do
-          expect(PreCommitHelper.run_checker(false, checker)).to be_falsy
-        end
-      end
-
-      context "when passed true" do
-        it "should return true" do
-          expect(PreCommitHelper.run_checker(true, checker)).to be_truthy
-        end
-      end
     end
 
     context "with a checker which returns errors for this project" do
@@ -123,18 +111,6 @@ RSpec.describe PreCommitHelper do
         expect(checker).to receive(:errors?)
         expect(checker).to receive(:messages)
         expect(checker_class).to receive(:deactivation_message)
-      end
-
-      context "when passed false" do
-        it "should return true" do
-          expect(PreCommitHelper.run_checker(false, checker)).to be_truthy
-        end
-      end
-
-      context "when passed true" do
-        it "should return true" do
-          expect(PreCommitHelper.run_checker(true, checker)).to be_truthy
-        end
       end
     end
 
@@ -149,13 +125,6 @@ RSpec.describe PreCommitHelper do
         expect(checker_class).to_not receive(:deactivation_message)
 
       end
-
-      context "when passed false" do
-        it "should return true" do
-          expect(PreCommitHelper.run_checker(false, checker)).to be_truthy
-        end
-      end
-
     end
   end
 

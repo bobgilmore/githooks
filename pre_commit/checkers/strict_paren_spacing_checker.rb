@@ -60,5 +60,4 @@ class StrictParenSpacingChecker
   SPACE_CLOSE_SMOOTH_REGEXP = /[ \t]+\)/
   OPEN_SQUARE_SPACE_REGEXP  = /\[[ \t]+/
   SPACE_CLOSE_SQUARE_REGEXP = /[ \t]+\]/
-
 end

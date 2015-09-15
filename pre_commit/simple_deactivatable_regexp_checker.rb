@@ -23,9 +23,7 @@ class SimpleDeactivatableRegexpChecker
     return [] if directory_excluded_from_all_checks?
     return [] if disabled_via_preference?
     return [] unless check_file_based_on_extension?
-    message = []
-    message << @warning_message if @changed_code.match(@regexp_code)
-    message
+    @changed_code.match(@regexp_code) ? [@warning_message] : []
   end
 
   private

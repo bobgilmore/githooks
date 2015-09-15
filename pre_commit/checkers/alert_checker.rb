@@ -31,8 +31,6 @@ class AlertChecker
   end
 
   EXTENSIONS_TO_IGNORE = ['.m', '.swift']
-
   FLASH = /flash\s*\[\s*:alert\s*\]/
   ALERT = /alert/
-
 end

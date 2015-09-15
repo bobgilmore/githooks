@@ -9,7 +9,7 @@ module PreCommitHelper
   end
 
   def self.check_file_based_on_extension?(params)
-    raise "extension_to_include and extensions_to_ignore are both included. Behavior undetermined." if !params[:extensions_to_include].nil? && !params[:extensions_to_ignore].nil?
+    raise "extension_to_include and extensions_to_ignore are both included. Behavior undetermined." if params[:extensions_to_include] && params[:extensions_to_ignore]
     ext = File.extname(params[:file])
     if params[:extensions_to_include]
       params[:extensions_to_include].include?(ext)
@@ -43,16 +43,6 @@ module PreCommitHelper
 
   def self.output_error_messages(checker)
     checker.messages.each { |e| puts(e) }
-  end
-
-  def self.run_checker(error_found, checker)
-    ret = error_found
-    if checker.errors?
-      ret = true
-      PreCommitHelper::output_error_messages(checker)
-      puts(checker.class.method(:deactivation_message).call) if checker.class.respond_to?(:deactivation_message)
-    end
-    ret
   end
 
   def self.checker_classes
