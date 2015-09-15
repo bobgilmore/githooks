@@ -25,7 +25,7 @@ module PreCommitHelper
   end
 
   def self.deactivation_message(to_permanently_blank_for_repo, key)
-    %{\nTo permanently #{to_permanently_blank_for_repo} for this repo, run\ngit config hooks.#{key} false\n\nTo permanently #{to_permanently_blank_for_repo} for *all* repos, run\ngit config --global hooks.#{key} false\n}
+    %{\nTo permanently #{to_permanently_blank_for_repo} for this repo, run\ngit config hooks.#{key} false\n\nTo permanently #{to_permanently_blank_for_repo} for *all* repos, run\ngit config --global hooks.#{key} false\n} if key
   end
 
   def self.directory_excluded_from_all_checks?(directory)
@@ -38,7 +38,7 @@ module PreCommitHelper
   end
 
   def self.git_config_val_for_hook(hook_name)
-    `git config hooks.#{hook_name}`.strip
+    hook_name ? `git config hooks.#{hook_name}`.strip : ""
   end
 
   def self.output_error_messages(checker)
