@@ -1,6 +1,6 @@
-require "simple_deactivatable_regexp_checker"
+require "simple_regexp_checker"
 
-class RubyNoThrowChecker < SimpleDeactivatableRegexpChecker
+class RubyNoThrowChecker < SimpleRegexpChecker
   def initialize(opts)
     merge_in = {
       hook_key: "forbid-ruby-throw",

@@ -1,6 +1,6 @@
-require "simple_deactivatable_regexp_checker"
+require "simple_regexp_checker"
 
-class RspecIsExpectedToChecker < SimpleDeactivatableRegexpChecker
+class RspecIsExpectedToChecker < SimpleRegexpChecker
 
   def initialize(opts)
     merge_in = {

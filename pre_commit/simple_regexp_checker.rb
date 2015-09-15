@@ -1,4 +1,4 @@
-class SimpleDeactivatableRegexpChecker
+class SimpleRegexpChecker
   attr_reader :messages
 
   def initialize(opts)
