@@ -7,7 +7,7 @@ class SimpleRegexpChecker
     @changed_code = opts[:changes]
     @hook_key = opts[:hook_key]
     @regexp_code = opts[:regexp_code]
-    @extensions_to_include = opts[:extensions_to_include]
+    @extensions_to_check = opts[:extensions_to_check]
     @extensions_to_ignore = opts[:extensions_to_ignore]
     @warning_message = opts[:warning_message]
 
@@ -38,7 +38,7 @@ class SimpleRegexpChecker
 
   def check_file_based_on_extension?
     PreCommitHelper.check_file_based_on_extension?(file: @file,
-                                                   extensions_to_include: @extensions_to_include,
+                                                   extensions_to_check: @extensions_to_check,
                                                    extensions_to_exclude: @extensions_to_exclude)
   end
 end

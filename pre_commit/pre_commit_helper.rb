@@ -9,10 +9,10 @@ module PreCommitHelper
   end
 
   def self.check_file_based_on_extension?(params)
-    raise "extension_to_include and extensions_to_ignore are both included. Behavior undetermined." if params[:extensions_to_include] && params[:extensions_to_ignore]
+    raise "extension_to_include and extensions_to_ignore are both included. Behavior undetermined." if params[:extensions_to_check] && params[:extensions_to_ignore]
     ext = File.extname(params[:file])
-    if params[:extensions_to_include]
-      params[:extensions_to_include].include?(ext)
+    if params[:extensions_to_check]
+      params[:extensions_to_check].include?(ext)
     elsif params[:extensions_to_ignore]
       !params[:extensions_to_ignore].include?(ext)
     else

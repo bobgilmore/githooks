@@ -21,12 +21,12 @@ RSpec.describe PreCommitHelper do
       expect(PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a")).to be_truthy
     end
 
-    it "should return true if there is a match to extensions_to_include" do
-      expect(PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_include: [".a", ".b"])).to be_truthy
+    it "should return true if there is a match to extensions_to_check" do
+      expect(PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_check: [".a", ".b"])).to be_truthy
     end
 
-    it "should return false if there is a match to extensions_to_include" do
-      expect(PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_include: [".c", ".d"])).to be_falsey
+    it "should return false if there is a match to extensions_to_check" do
+      expect(PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_check: [".c", ".d"])).to be_falsey
     end
 
     it "should return false if there is a match to extensions_to_ignore" do
@@ -37,8 +37,8 @@ RSpec.describe PreCommitHelper do
       expect(PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_ignore: [".c", ".d"])).to be_truthy
     end
 
-    it "should raise an error is both extensions_to_include and extensions_to_ignore are included" do
-      expect { PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_ignore: [".a"], extensions_to_include: [".b"]) }.to raise_error
+    it "should raise an error is both extensions_to_check and extensions_to_ignore are included" do
+      expect { PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_ignore: [".a"], extensions_to_check: [".b"]) }.to raise_error
     end
   end
 
