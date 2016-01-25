@@ -31,9 +31,9 @@ NON_CHECKED_FILE_NAMES = [
 ]
 
 PROJECT_TYPE = PreCommitHelper::project_type
-TOPLEVEL = `git rev-parse --show-toplevel`
 
 res = CheckerResults.new
+
 # Loop over ALL errors and warnings and return ALL problems.
 # I want to report on *all* problems that exist in the commit before aborting,
 # so that anyone calling --no-verify has been informed of all problems first.
@@ -43,19 +43,28 @@ full_diff = `git diff --cached --`.encode("UTF-8")
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   unless (NON_CHECKED_FILE_NAMES.include?(file) || NON_CHECKED_FILE_EXTENSIONS.include?(File.extname(file)))
     dir = File.dirname(file)
+    
     changed_code_for_file = diff.split("\n").select { |x| x.start_with?("+") }.join("\n")
+    changed_lines_for_file = diff.split("\n").select { |x| x.start_with?("+") }
 
-    diff_data = { directory: dir,
-      file: file,
-      changes: changed_code_for_file,
-      toplevel: TOPLEVEL,
-      project_type: PROJECT_TYPE }
-
-    PreCommitHelper.checker_classes.each do |checker_class|
-      res.record(checker_class.new(diff_data))
-    end
+    res.record(AlertChecker.new(directory: dir, file: file, changes: changed_lines_for_file))
+    res.record(ForbiddenStringChecker.new(file: file, changes: changed_code_for_file, project_type: PROJECT_TYPE))
+    res.record(PrivateKeyChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(RspecExpectToReceiveChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(RspecIsExpectedToChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(RspecShouldEqualChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(RspecToNotChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(RubyNoThrowChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(StrictParenSpacingChecker.new(directory: dir, file: file, changes: changed_code_for_file))
+    res.record(UserHomeChecker.new(directory: dir, file: file, changes: changed_code_for_file))
   end
 end
+
+name_only_array = `git diff --cached --name-only`.split(/\n/)
+toplevel = `git rev-parse --show-toplevel`
+
+res.record(SyntaxRubyChecker.new(toplevel: toplevel, files: name_only_array))
+res.record(RubyVersionChecker.new(files: name_only_array))
 
 # Report errors and fail the commit if necessary
 if res.errors?

@@ -2,8 +2,8 @@ class RubyVersionChecker
   attr_reader :messages
 
   def initialize(opts)
-    @file = opts[:file]
-    @force_pref_on = opts[:force_pref_on]
+    @files = opts[:files]
+    @pref_on = !!opts[:pref_on]
     @messages = examine_code
   end
 
@@ -12,12 +12,14 @@ class RubyVersionChecker
   end
 
   def examine_code
-    file_is_forbidden? ? [%{Edit to #{@file} - you probably didn't mean to do commit that.}] : []
+    mess = []
+    @files.each do |file|
+      base = File.basename(file)
+      if base == '.ruby-version' || base == '.rbenv-version'
+        mess << %{Edit to #{base} - you probably didn't mean to do that.}
+      end
+    end
+    mess
   end
 
-  private
-
-  def file_is_forbidden?
-    @file == '.ruby-version' || @file == '.rbenv-version'
-  end
 end
