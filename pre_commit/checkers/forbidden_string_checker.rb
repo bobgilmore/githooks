@@ -1,11 +1,10 @@
 class ForbiddenStringChecker
-  attr_reader :messages, :project_type
+  attr_reader :messages
 
   def initialize(opts)
     @file = opts[:file]
     @changed_code = opts[:changes]
     @project_type = opts[:project_type]
-
     @messages = examine_code
   end
 

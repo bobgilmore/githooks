@@ -4,7 +4,7 @@ class AlertChecker
   def initialize(opts)
     @dir = opts[:dir]
     @file = opts[:file]
-    @changed_code_array = opts[:changes]
+    @changed_code_array = opts[:changes].split("\n")
     @messages = examine_code
   end
 
@@ -31,8 +31,6 @@ class AlertChecker
   end
 
   EXTENSIONS_TO_IGNORE = ['.m', '.swift']
-
   FLASH = /flash\s*\[\s*:alert\s*\]/
   ALERT = /alert/
-
 end

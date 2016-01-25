@@ -7,8 +7,9 @@ class SyntaxRubyChecker
 
   def initialize(opts)
     @toplevel = opts[:toplevel]
-    @files = opts[:files]
-    @pref_on = !!opts[:pref_on]
+    @file = opts[:file]
+    @dir = opts[:directory]
+    @force_pref_on = opts[:force_pref_on]
     @messages = examine_code
   end
 
@@ -17,16 +18,14 @@ class SyntaxRubyChecker
   end
 
   def examine_code
-    return [] unless self.class.use_for_project?
+    return [] if disabled_via_preference?
     mess = []
-    @files.each do |file|
-      if File.extname(file) == '.rb'
-        fullfile = File.join(@toplevel.strip, file)
-        if File.exist?(fullfile)
-          output = `ruby -c #{fullfile}`
-          status = $?.success?
-          mess <<  warning_message(fullfile) unless status
-        end
+    if File.extname(@file) == '.rb'
+      fullfile = File.join(@toplevel.strip, @dir, @file)
+      if File.exist?(fullfile)
+        output = `ruby -c #{fullfile}`
+        status = $?.success?
+        mess << warning_message(fullfile) unless status
       end
     end
     mess
@@ -34,9 +33,8 @@ class SyntaxRubyChecker
 
   private
 
-  def self.use_for_project?
-    val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
-    val.empty? || (val == 'true') || @pref_on
+  def disabled_via_preference?
+    PreCommitHelper.disabled_via_preference?(HOOK_KEY, @force_pref_on)
   end
 
   def warning_message(fullfile)
