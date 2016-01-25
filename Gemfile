@@ -3,4 +3,3 @@ gem "bundler"
 gem "rspec"
 gem "rake"
 gem "pry"
-gem 'pry-byebug'
