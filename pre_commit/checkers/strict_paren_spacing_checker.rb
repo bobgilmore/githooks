@@ -9,8 +9,7 @@ class StrictParenSpacingChecker
     @dir = opts[:dir]
     @file = opts[:file]
     @changed_code = opts[:changes]
-    @project_type = opts[:project_type]
-    @force_pref_on = opts[:force_pref_on]
+    @pref_on = !!opts[:pref_on]
     @messages = examine_code
   end
 
@@ -19,8 +18,7 @@ class StrictParenSpacingChecker
   end
 
   def examine_code
-    return [] if @project_type == :xcode
-    return [] if disabled_via_preference?
+    return [] unless self.class.use_for_project?
     mess = []
     if PreCommitHelper.check_file_in_directory?(file: @file, directory: @dir, extensions_to_ignore: EXTENSIONS_TO_IGNORE_ALL)
       mess << warning_message(OPEN_SMOOTH_SPACE) if @changed_code.match(OPEN_SMOOTH_SPACE_REGEXP)
@@ -35,8 +33,10 @@ class StrictParenSpacingChecker
 
   private
 
-  def disabled_via_preference?
-    PreCommitHelper.disabled_via_preference?(HOOK_KEY, @force_pref_on)
+  def self.use_for_project?
+    return false if PreCommitHelper.project_type == :xcode
+    val = PreCommitHelper.git_config_val_for_hook(HOOK_KEY)
+    val.empty? || (val == 'true') || @pref_on
   end
 
   def warning_message(bad_expression)
@@ -60,4 +60,5 @@ class StrictParenSpacingChecker
   SPACE_CLOSE_SMOOTH_REGEXP = /[ \t]+\)/
   OPEN_SQUARE_SPACE_REGEXP  = /\[[ \t]+/
   SPACE_CLOSE_SQUARE_REGEXP = /[ \t]+\]/
+
 end
