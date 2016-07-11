@@ -38,7 +38,7 @@ RSpec.describe PreCommitHelper do
     end
 
     it "should raise an error is both extensions_to_check and extensions_to_ignore are included" do
-      expect { PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_ignore: [".a"], extensions_to_check: [".b"]) }.to raise_error
+      expect { PreCommitHelper.check_file_based_on_extension?(file: "/home/foo/bar.a", extensions_to_ignore: [".a"], extensions_to_check: [".b"]) }.to raise_error(RuntimeError, /extension_to_include and extensions_to_ignore/)
     end
   end
 
