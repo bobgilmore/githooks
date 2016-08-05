@@ -30,18 +30,18 @@ class ForbiddenStringChecker
   private
 
   FORBIDDEN_STRINGS = [
-    /TMP_DEBUG/, # My TextExpander macros for embedding debug code always include this for easy scanning.
-    />>>>>>/,    # Git conflict markers
-    /<<<<<</,    # "
-    /binding\.pry/,        # pry debugging code
+    /^>>>>>>/, # Git conflict markers
+    /^======/, # "
+    /^<<<<<</, # "
+    /binding\.pry/, # pry debugging code
     /binding\.remote_pry/, # "
-    /debugger/,      # Ruby < 2.0 debugging code, JS debugging code.
-    /byebug/,        # Ruby >= 2.0 debugging code
+    /byebug/, # Ruby >= 2.0 debugging code
+    /debugger/, # Ruby < 2.0 debugging code, JS debugging code.
     /logger\.debug/, # I almost never want to commit a (Ruby) call to logger.debug.  error, message, etc., but not debug.
-    /====/,          # Git merge conflict marker
-    /save_and_open_screenshot/, # Capybara debugging
-    /save_screenshot/,          # "
-    /save_and_open_page/        # "
+    /save_and_open_page/, # Capybara debugging
+    /save_and_open_screenshot/, # "
+    /save_screenshot/, # "
+    /TMP_DEBUG/ # My TextExpander macros for embedding debug code always include this for easy scanning.
   ]
 
   FORBIDDEN_STRINGS_EXCEPT_IN_NODE = [

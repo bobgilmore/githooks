@@ -17,18 +17,33 @@ RSpec.describe ForbiddenStringChecker do
   end
 
   describe "code with git conflict markers >>>>>>" do
-    subject(:checker) { test_class_with_change(checker_class, "Hello >>>>>>>> there") }
+    subject(:checker) { test_class_with_change(checker_class, ">>>>>>>> there") }
     it_should_behave_like "it finds an error"
   end
 
   describe "code with git conflict markers <<<<<<<" do
-    subject(:checker) { test_class_with_change(checker_class, "Hello <<<<<<<< there") }
+    subject(:checker) { test_class_with_change(checker_class, "<<<<<<<< there") }
     it_should_behave_like "it finds an error"
   end
 
   describe "code with git conflict markers =======" do
-    subject(:checker) { test_class_with_change(checker_class, "Hello ======== there") }
+    subject(:checker) { test_class_with_change(checker_class, "======== there") }
     it_should_behave_like "it finds an error"
+  end
+
+  describe "code with nearly git conflict markers >>>>>>" do
+    subject(:checker) { test_class_with_change(checker_class, "Hello >>>>>>>> there") }
+    it_should_behave_like "it finds no error"
+  end
+
+  describe "code with nearly git conflict markers <<<<<<<" do
+    subject(:checker) { test_class_with_change(checker_class, "Hello <<<<<<<< there") }
+    it_should_behave_like "it finds no error"
+  end
+
+  describe "code with nearly git conflict markers =======" do
+    subject(:checker) { test_class_with_change(checker_class, "Hello ======== there") }
+    it_should_behave_like "it finds no error"
   end
 
   describe "code that calls the pry debugger" do
