@@ -59,8 +59,24 @@ RSpec.describe PreCommitHelper do
       end
     end
 
+    context "in a one-deep ruby directory" do
+      let(:dir) { project_dir("ruby_deep") }
+
+      it "should return :ruby" do
+        expect(PreCommitHelper.project_type(dir)).to eq :ruby
+      end
+    end
+
     context "in a node directory" do
       let(:dir) { project_dir("node") }
+
+      it "should return :node" do
+        expect(PreCommitHelper.project_type(dir)).to eq :node
+      end
+    end
+
+    context "in a one-deep node directory" do
+      let(:dir) { project_dir("node_deep") }
 
       it "should return :node" do
         expect(PreCommitHelper.project_type(dir)).to eq :node
@@ -75,8 +91,24 @@ RSpec.describe PreCommitHelper do
       end
     end
 
+    context "in a one-deep xcode directory" do
+      let(:dir) { project_dir("xcode_deep") }
+
+      it "should return :xcode" do
+        expect(PreCommitHelper.project_type(dir)).to eq :xcode
+      end
+    end
+
     context "in an unknown directory" do
       let(:dir) { project_dir("unknown") }
+
+      it "should return nil" do
+        expect(PreCommitHelper.project_type(dir)).to be_falsey
+      end
+    end
+
+    context "in a one-deep unknown directory" do
+      let(:dir) { project_dir("unknown_deep") }
 
       it "should return nil" do
         expect(PreCommitHelper.project_type(dir)).to be_falsey
