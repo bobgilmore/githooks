@@ -30,9 +30,9 @@ class ForbiddenStringChecker
   private
 
   FORBIDDEN_STRINGS = [
-    /^>>>>>>/, # Git conflict markers
-    /^======/, # "
-    /^<<<<<</, # "
+    /^+>>>>>>/, # Git conflict markers
+    /^+======/, # "
+    /^+<<<<<</, # "
     /binding\.pry/, # pry debugging code
     /binding\.remote_pry/, # "
     /byebug/, # Ruby >= 2.0 debugging code
