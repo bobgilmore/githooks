@@ -33,6 +33,7 @@ NON_CHECKED_FILE_NAMES = [
 PROJECT_TYPE = PreCommitHelper::project_type
 TOPLEVEL = `git rev-parse --show-toplevel`
 
+puts("Comitting to #{@project_type ? @project_type.capitalize : 'unknown type of'} project")
 res = CheckerResults.new
 # Loop over ALL errors and warnings and return ALL problems.
 # I want to report on *all* problems that exist in the commit before aborting,
