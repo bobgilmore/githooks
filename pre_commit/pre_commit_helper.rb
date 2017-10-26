@@ -6,12 +6,11 @@ module PreCommitHelper
     # if File.exist?(File.join(toplevel, 'Gemfile')) || File.exist?(File.join(toplevel, '*', 'Gemfile'))
     #   return :ruby
     # end
-    return :ruby if file_exists_at_top_or_one_deep(toplevel, 'Gemfile')
-    return :node if file_exists_at_top_or_one_deep(toplevel, 'package.json')
     if Dir.glob(File.join(toplevel, '*.xcodeproj')).any? || Dir.glob(File.join(toplevel, '*', '*.xcodeproj')).any?
       return :xcode
     end
-    return nil
+    return :ruby if file_exists_at_top_or_one_deep(toplevel, 'Gemfile')
+    return :node if file_exists_at_top_or_one_deep(toplevel, 'package.json')
   end
 
   def self.check_file_based_on_extension?(params)
