@@ -1,6 +1,7 @@
 module PreCommitHelper
   EXTENSIONS_RUBY = [".rb"]
-
+  EXTENSIONS_SWIFT = [".swift", ".xib", ".storyboard"]
+  
   def self.project_type(toplevel = `git rev-parse --show-toplevel`.strip)
     # puts (File.join(toplevel, '*', 'Gemfile'))
     # if File.exist?(File.join(toplevel, 'Gemfile')) || File.exist?(File.join(toplevel, '*', 'Gemfile'))

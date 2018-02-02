@@ -45,3 +45,9 @@ def test_class_with_change(checker_class, code_under_test, other_hash_args = {})
     merge(changes: code_under_test).
     merge(other_hash_args))
 end
+
+def test_class_with_change_with_extension(checker_class, code_under_test, extension, other_hash_args = {})
+  checker_class.new({ directory: "/usr/local", file: "fizzbuzz.#{extension}", force_pref_on: true }.
+    merge(changes: code_under_test).
+    merge(other_hash_args))
+end
