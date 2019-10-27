@@ -39,7 +39,7 @@ res = CheckerResults.new
 # I want to report on *all* problems that exist in the commit before aborting,
 # so that anyone calling --no-verify has been informed of all problems first.
 
-full_diff = `git diff --cached --`.encode("UTF-8")
+full_diff = `git diff --cached --`.force_encoding("UTF-8")
 
 full_diff.scan(%r{^\+\+\+ b/(.+)\n@@.*\n([\s\S]*?)(?:^diff|\z)}).each do |file, diff|
   unless (NON_CHECKED_FILE_NAMES.include?(file) || NON_CHECKED_FILE_EXTENSIONS.include?(File.extname(file)))

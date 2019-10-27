@@ -36,14 +36,15 @@ do
 		if [ "$remote_sha" = $z40 ]
 		then
 			# New branch, examine all commits
-			range="$local_sha"
+		        range="$local_sha"
 		else
 			# Update to existing branch, examine new commits
 			range="$remote_sha..$local_sha"
 		fi
+		echo "Checking range: $range" 
 
 		# Check for foo commit
-		commit=`git rev-list -n 1 --grep '^foo' "$range"`
+		commit=`git rev-list -n 1 --grep '^foo(bar)?$' "$range"`
 		if [ -n "$commit" ]
 		then
 			echo "ERROR: git pre-push hook found commit message starting with 'foo' in $local_ref"
